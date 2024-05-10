@@ -1,0 +1,8 @@
+/build/
+.deno/*
+!.deno/npm
+.direnv/*
+.cache
+.config
+.local
+.replit
