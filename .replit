@@ -1,6 +1,6 @@
 compile = "bff build"
 run = "bff main"
-entrypoint = "bolt-foundry/docs/developing-on-replit.md"
+entrypoint = "docs/developing-on-replit.md"
 
 [nix]
 channel = "stable-23_11"

@@ -16,6 +16,11 @@ the name in the upper left corner, then hit the three dots menu, and select
 Now, give it a name related to your project, ideally prefixed with your name,
 and enter a description to help others know what your fork is intended to do.
 
+## Temporary bug
+
+Right now when you fork, you'll have to update the name after it forks because
+projects is in beta.
+
 ![Example naming dialog](assets/developing-on-replit/bf-base-dropdown.png)
 
 At this point, Replit will automatically redirect you to your repl. You should
@@ -35,64 +40,37 @@ ready, it'll open a webview.
 
 To refresh after making a change, hit `cmd + enter` and it'll reload the server.
 
-### Commit changes
+### Commit changes using Git
 
-Open the shell by using either the command pallate (cmd + k) and typing "shell",
-or ctrl + tilde (~) or as a tab in the UI. Within the shell, run the command:
-
-```sh
-bff commit 
-```
-
-This will automatically log you into github, and open VS Code.
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-**DO NOT EDIT FILES USING VSCODE. VS CODE IS ONLY FOR USING SAPLING.**
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-All of our tooling is built for Replit, except one: Sapling. For now, that
-dependency still relies on us using VSCode. We anticipate that going away with
-the next release of sapling.
+Open the git pane using `cmd + k`. Add your changes, and leave a good commit
+message.
 
 #### Individual commits are "whole changes" bundled into one
 
 Your goal should be to commit individual units of changes one commit at a time.
-[Sapling's smartlog overview](https://sapling-scm.com/docs/overview/smartlog)
-explains the nitty gritty of smartlog better than I could.
 
-#### Submitting commits will automatically create pull requests
-
-Since Sapling doesn't use branches, commits will automatically be turned into
-pull requests and branches, etc., without you needing to do anything.
-
-### Code Review
+### Code Reviews (WIP!)
 
 Code review mostly happens synchronously via pair coding, but if you're working
 async, ping
 [#code-corner on Discord](https://discord.com/channels/1128726973770903703/1128760802636218568)
-with a link to the commit you'd like to review, and ping the `@Code Reviewers`
+with a link to the repl you'd like to review, and ping the `@Code Reviewers`
 role.
 
-### Landing
+We anticipate most of our code reviews happening on Replit with no github
+whatsoever. You can leave comments and have a chat. 
 
-Code reviewers will go back and forth, and eventually you'll get your commit
-approved. Then, merge it using GitHub.
+![starting a thread example](assets/developing-on-replit/starting-a-thread.png)
 
-### Deploying
+This is still super rough, so we're figuring it out.
 
-Warning: This sucks super badly right now, but will get better soon hopefully.
+### Landing (WIP)
 
-Go to the
-[boltfoundry.com repl](https://replit.com/t/bolt-foundry/xjbbzx/repls/boltfoundrycom).
-Run:
+It's really easy to land your change. Open the "projects" pane from `cmd+k`
+and then click the big merge changes into bf base button.
 
-```sh
-bff update
-```
+![starting a thread example](assets/developing-on-replit/merge-changes.png)
 
-then hit the big "redeploy" button in the upper right corner.
+### Deploying (WIP)
 
-**IMPORTANT**: You'll have to repeat this process for the worker, but that
-doesn't exist yet.
+rb will make a script. For now ask him how to deploy for real.
