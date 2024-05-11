@@ -7,14 +7,14 @@ import { getGoogleOauthUrl } from "lib/googleOauth.ts";
 
 const logger = getLogger(import.meta);
 export enum DeploymentTypes {
-  "WEB" = "WEB";
-  "INTERNAL" = "INTERNAL";
+  "WEB" = "WEB",
+  "INTERNAL" = "INTERNAL",
 }
 
 export enum DeploymentEnvs {
-  "DEVELOPMENT" = "DEVELOPMENT";
-  "STAGING" = "STAGING";
-  "PRODUCTION" = "PRODUCTION";
+  "DEVELOPMENT" = "DEVELOPMENT",
+  "STAGING" = "STAGING",
+  "PRODUCTION" = "PRODUCTION",
 }
 type Handler = (
   request: Request,
