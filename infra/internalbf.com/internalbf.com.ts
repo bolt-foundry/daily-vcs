@@ -2,7 +2,7 @@
 
 Deno.serve(async (req, info) => {
   info.completed.then(() => {
-    console.log("Completed", req.url);
+    console.log("Completed");
   })
   return new Response("yo");
 })
