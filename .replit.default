@@ -1,5 +1,6 @@
 compile = "bff build"
 run = "bff main"
+onBoot = "bff boot"
 entrypoint = "docs/developing-on-replit.md"
 
 [nix]
@@ -52,3 +53,8 @@ BF_ENV = "DEVELOPMENT"
 GOOGLE_OAUTH_CLIENT_ID = "1053566961455-rreuknvho4jqcj184evmj93n7n1nrjun.apps.googleusercontent.com"
 BF_AUTH_REDIRECT_DOMAIN = "boltfoundrywtf.replit.app"
 GOOGLE_OAUTH_REDIRECT_URL = "$BF_AUTH_REDIRECT_DOMAIN/google/oauth/end"
+
+[deployment]
+deploymentTarget = "cloudrun"
+run = ["bff", "main"]
+build = ["bff", "build"]
