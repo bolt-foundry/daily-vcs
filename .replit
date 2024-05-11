@@ -19,7 +19,7 @@ start = ["deno", "lsp"]
 enable = true
 lint = true
 unstable = true
-config = "./bolt-foundry/deno.jsonc"
+config = "./deno.jsonc"
 suggest.imports.autoDiscover = false
 enablePaths = [
   "./packages",
@@ -29,7 +29,6 @@ enablePaths = [
   "./content",
   "./lib",
 ]
-maxTsServerMemory = 16000
 
 [[hints]]
 regex = "generatedGraphQLFile"
