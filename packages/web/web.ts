@@ -160,44 +160,11 @@ const defaultRoute = () => {
   return new Response("Not found", { status: 404 });
 };
 
-const deploymentType = Deno.env.get("DEPLOYMENT_TYPE") ??
-  DeploymentTypes.DEVELOPMENT;
-
-let shouldLaunchWeb = true;
-let shouldLaunchWorker = true;
-
-switch (deploymentType) {
-  case DeploymentTypes.WEB: {
-    shouldLaunchWorker = false;
-    break;
-  }
-  case DeploymentTypes.WORKER: {
-    shouldLaunchWeb = false;
-    break;
-  }
-}
-
-if (import.meta.main) {
-  if (shouldLaunchWeb) {
-    Deno.serve(async (req) => {
-      const incomingUrl = new URL(req.url);
-      logger.info(
-        `Incoming request: ${req.method} ${incomingUrl.pathname}`,
-      );
-      const handler = routes.get(incomingUrl.pathname) ?? defaultRoute;
-      return await handler(req);
-    });
-  }
-
-  if (shouldLaunchWorker) {
-    const _worker = new Worker(
-      import.meta.resolve("packages/worker/worker.ts"),
-      { type: "module" },
-    );
-    logger.info("Launched worker");
-    if (deploymentType === DeploymentTypes.DEVELOPMENT) {
-      const keepaliveLogger = getLogger("workerKeepalive");
-      keepaliveLogger.disableAll();
-    }
-  }
-}
+Deno.serve(async (req) => {
+  const incomingUrl = new URL(req.url);
+  logger.info(
+    `Incoming request: ${req.method} ${incomingUrl.pathname}`,
+  );
+  const handler = routes.get(incomingUrl.pathname) ?? defaultRoute;
+  return await handler(req);
+});
