@@ -47,11 +47,14 @@ routes.set("/build/Client.js", async () => {
   });
 });
 
-routes.set("/login", async (...args) => {
+routes.set("/login", (...args) => {
   const [req] = args;
   const url = new URL(req.url);
   const credential = url.searchParams.get("credential");
   if (credential) {
+    return clientRenderer(true)(...args);
+  }
+  if (Deno.env.get('BF_ENV') === "PRODUCTION") {
     return clientRenderer(true)(...args);
   }
 
