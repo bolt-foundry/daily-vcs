@@ -42,7 +42,7 @@ type BfRefreshTokenPayload = BfAccessTokenPayload & {
 async function jwkToCryptoKey(
   jwk: { kty: string; n: string; e: string; alg: string },
 ) {
-  const key = await window.crypto.subtle.importKey(
+  const key = await globalThis.crypto.subtle.importKey(
     "jwk",
     {
       kty: jwk.kty,

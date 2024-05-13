@@ -59,16 +59,16 @@ routes.set("/login", async (...args) => {
     return clientRenderer(...args);
   }
 
-  switch (deploymentEnvironment) {
-    case DeploymentEnvs.DEVELOPMENT: {
-      return new Response(null, {
-        status: 302,
-        headers: {
-          location: `https://${redirectDomain}/login?hostname=${hostname}`,
-        },
-      });
-    }
-  }
+  // switch (deploymentEnvironment) {
+  //   case DeploymentEnvs.DEVELOPMENT: {
+  //     return new Response(null, {
+  //       status: 302,
+  //       headers: {
+  //         location: `https://${redirectDomain}/login?hostname=${hostname}`,
+  //       },
+  //     });
+  //   }
+  // }
 
   return clientRenderer(...args);
 });

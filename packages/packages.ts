@@ -10,15 +10,15 @@ const _worker = new Worker(
   { type: "module", name: entrypointPath },
 )
 
-// Listen for SIGTERM signal and log a message
-Deno.addSignalListener("SIGTERM", () => {
-  console.log("SIGTERM signal received. Shutting down.");
-});
+// // Listen for SIGTERM signal and log a message
+// Deno.addSignalListener("SIGTERM", () => {
+//   console.log("SIGTERM signal received. Shutting down.");
+// });
 
-Deno.addSignalListener("SIGINT", () => {
-  console.log("SIGINT signal received. Shutting down.");
-})
+// Deno.addSignalListener("SIGINT", () => {
+//   console.log("SIGINT signal received. Shutting down.");
+// })
 
-Deno.addSignalListener("SIGHUP", () => {
-  console.log("SIGHUP signal received. Shutting down.");
-})
+// Deno.addSignalListener("SIGHUP", () => {
+//   console.log("SIGHUP signal received. Shutting down.");
+// })

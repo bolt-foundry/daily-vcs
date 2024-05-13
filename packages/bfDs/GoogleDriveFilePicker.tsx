@@ -1,8 +1,8 @@
 import { React, ReactRelay } from "deps.ts";
 // import { graphql, ReactRelay } from "packages/bfDs/deps.ts";
 import { Button } from "packages/bfDs/Button.tsx";
-import { GoogleDriveFilePickerQuery } from "packages/__generated__/GoogleDriveFilePickerQuery.graphql.ts";
-import { GoogleDriveFilePickerLinkGoogleAccountMutation } from "packages/__generated__/GoogleDriveFilePickerLinkGoogleAccountMutation.graphql.ts";
+// import { GoogleDriveFilePickerQuery } from "packages/__generated__/GoogleDriveFilePickerQuery.graphql.ts";
+// import { GoogleDriveFilePickerLinkGoogleAccountMutation } from "packages/__generated__/GoogleDriveFilePickerLinkGoogleAccountMutation.graphql.ts";
 import { useAppEnvironment } from "packages/client/contexts/AppEnvironmentContext.tsx";
 
 const { useLazyLoadQuery, useMutation } = ReactRelay;
