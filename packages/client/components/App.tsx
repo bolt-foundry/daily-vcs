@@ -24,11 +24,13 @@ import {
   matchRouteWithParams,
   useRouter,
 } from "packages/client/contexts/RouterContext.tsx";
+import { ProjectNew } from "packages/client/pages/ProjectNew.tsx";
 
 export const routes = new Map([
-  ["/", { Component: Marketing }],
-  ["/login", { Component: LoginPage }],
+  ["/", { Component: Marketing, allowLoggedOut: true }],
+  ["/login", { Component: LoginPage, allowLoggedOut: true }],
   ["/internalBf", { Component: InternalBfPage }],
+  ["/projects/new", { Component: ProjectNew }],
   ["/projects", { Component: ProjectPageWithFrame }],
   // ["/projects/:projectId?", { Component: ProjectPageWithFrame }],
 ]);

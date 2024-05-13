@@ -223,15 +223,15 @@ export const LogoutMutation = mutationField((t) => {
     type: "BfCurrentViewer",
     resolve: (_src, _args, context) => {
       try {
-        const response: Response = context.response;
-        response.headers.append("Set-Cookie", "BF_AT=; Path=/; Max-Age=0");
-        response.headers.append("Set-Cookie", "BF_RT=; Path=/; Max-Age=0");
+        const headers: Headers = context.responseHeaders;
+        headers.append("Set-Cookie", "BF_AT=; Path=/; Max-Age=0");
+        headers.append("Set-Cookie", "BF_RT=; Path=/; Max-Age=0");
       } catch (e) {
         throw new GraphQLError(
           "Logout failed... sorry about that. We've logged it and will look into it.",
         );
       }
-      return BfCurrentViewerAnon.create(import.meta);
+      
     },
   });
 });

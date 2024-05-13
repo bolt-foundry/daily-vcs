@@ -22,19 +22,20 @@ const styles: Record<string, React.CSSProperties> = {
   },
   error: {
     background: "var(--backgroundAlert)",
+    color: "var(--textOnAlert)",
     padding: 12,
     borderRadius: 8,
     border: "1px solid var(--alert)",
   },
 };
 
-// const logoutMutation = await graphql`
-//   mutation LoginPageLogoutMutation {
-//     logout {
-//       __typename
-//       }
-//     }
-// `;
+const logoutMutation = await graphql`
+  mutation LoginPageLogoutMutation {
+    logout {
+      __typename
+      }
+    }
+`;
 
 const cvQuery = await graphql`
   query LoginPageCVQuery {
@@ -48,10 +49,9 @@ const cvQuery = await graphql`
 function LoginPageContent() {
   const cvData = useLazyLoadQuery<LoginPageCVQuery>(cvQuery, {});
   
-  const logoutInFlight = false;
 
-  // const [_logoutError, setLogoutError] = React.useState<string | null>(null);
-  // const [logoutCommit, logoutInFlight] = useMutation(logoutMutation);
+  const [logoutError, setLogoutError] = React.useState<string | null>(null);
+  const [logoutCommit, logoutInFlight] = useMutation(logoutMutation);
 
   const loggedInPerson = cvData?.currentViewer?.person;
 
@@ -60,22 +60,23 @@ function LoginPageContent() {
   }, []);
 
   const onLogout = () => {
-    console.log("logout");
-    // logoutCommit({
-    //   variables: {},
-    //   onCompleted: (response, errors) => {
-    //     if (errors) {
-    //       const errorMessage = errors.map((e: { message: string }) => e.message)
-    //         .join(", ");
-    //       setLogoutError(errorMessage);
-    //     } else {
-    //       window.location.assign("/"); // TODO fix navigate() in RouterContext
-    //     }
-    //   },
-    //   onError: (error) => {
-    //     setLogoutError(error.message);
-    //   },
-    // });
+    logoutCommit({
+      variables: {},
+      // @ts-expect-error not typed yet
+      onCompleted: (response, errors) => {
+        if (errors) {
+          const errorMessage = errors.map((e: { message: string }) => e.message)
+            .join(", ");
+          setLogoutError(errorMessage);
+        } else {
+          window.location.assign("/"); // TODO fix navigate() in RouterContext
+        }
+      },
+      // @ts-expect-error not typed yet
+      onError: (error) => {
+        setLogoutError(error.message);
+      },
+    });
   };
 
   return (
@@ -92,6 +93,9 @@ function LoginPageContent() {
           </div>
         )}
         {!loggedInPerson && <LoginForm />}
+        {logoutError && (
+          <div style={styles.error}>{logoutError}</div>
+        )}
       </div>
     </div>
   );

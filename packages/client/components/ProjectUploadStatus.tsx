@@ -1,17 +1,12 @@
 import { Maybe, React, ReactRelay } from "deps.ts";
 // import { CreateNewProject_project$key } from "packages/__generated__/CreateNewProject_project.graphql.ts";
 import { useRouter } from "packages/client/contexts/RouterContext.tsx";
-import { Tab, Tabs } from "packages/bfDs/Tabs.tsx";
-import { FileUpload } from "packages/client/components/FileUpload.tsx";
-import { WorkflowYoutube } from "packages/client/components/WorkflowYoutube.tsx";
-import { fonts } from "packages/bfDs/const.tsx";
 import { WorkflowUploadStep } from "packages/client/components/WorkflowUploadStep.tsx";
 import { WorkflowTranscribeStep } from "packages/client/components/WorkflowTranscribeStep.tsx";
 import { WorkflowClipStep } from "packages/client/components/WorkflowClipStep.tsx";
 import { Step } from "packages/client/components/Step.tsx";
 import { useFeatureFlag } from "packages/client/hooks/featureFlagHooks.ts";
 import TVStatic from "packages/client/images/TVStatic.tsx";
-import { Button } from "packages/bfDs/Button.tsx";
 
 const { Suspense, useEffect, useState } = React;
 
@@ -34,9 +29,6 @@ const styles: Record<string, React.CSSProperties> = {
     boxSizing: "border-box",
   },
   page: {
-    background: "var(--pageBackground)",
-    color: "var(--text)",
-    fontFamily: fonts.fontFamily,
     alignItems: "center",
     display: "flex",
     flexDirection: "column",
@@ -59,6 +51,7 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 type Props = {
+  project$key: CreateNewProject_project$key | null;
 };
 
 // const fragment = await graphql`
@@ -70,9 +63,10 @@ type Props = {
 //     ...LocalFileWorkflowUpload_project
 //     }`;
 
-export function CreateNewProject({ }: Props) {
+export function ProjectUploadStatus({ project$key }: Props) {
   const { navigate } = useRouter();
-  const [workflowTab, setWorkflowTab] = useState<string>("Upload");
+  // const project = ReactRelay.useFragment(fragment, project$key);
+  const project = {};
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadCompleted, setUploadComplete] = useState<boolean>(false);
   const [uploadPercent, setUploadPercent] = useState<number>(0);
@@ -119,8 +113,6 @@ export function CreateNewProject({ }: Props) {
     );
   }
 
-  const enableYoutube = false;
-
   const uploaded = project?.videoUrl != null;
 
   const uploadComplete = Boolean(
@@ -138,85 +130,28 @@ export function CreateNewProject({ }: Props) {
     setUploadComplete(true);
   };
 
-  const tabs: Tab[] = [
-    {
-      name: "Upload",
-    },
-    {
-      name: "YouTube",
-    },
-  ];
-
-  const showSteps = Boolean(uploading || uploadComplete);
-
-  function WorkflowUpload(
-    { project$key }: { project$key: Maybe<CreateNewProject_project$key> },
-  ) {
-    let text = "Upload a video file up to 2000MB directly to the platform. ";
-    if (enableYoutube) {
-      text +=
-        "If you want to use a bigger file, upload to YouTube using the tab above.";
-    }
-
-    return !showSteps
-      ? (
-        <>
-          <div>
-            <h1>Upload a video</h1>
-            <p>{text}</p>
-          </div>
-          {
-            /* <FileUpload
-            onStart={() => setUploading(true)}
-            onProgress={handleProgress}
-            onComplete={handleUpload}
-            onError={(message) => setUploadError(message)}
-            project$key={project}
-            maxSizeMB={2000}
-          /> */
-          }
-          {/* TEMP Button */}
-          <Button
-            text="Fake upload"
-            onClick={() => globalThis.location.href = "/projects/1234"}
-          />
-        </>
-      )
-      : (
-        <div>
-          <h1>Processing video...</h1>
-        </div>
-      );
-  }
-
-  const WorkflowUploadComponent = WorkflowUpload;
-
   return (
-    <div style={styles.page}>
+    <div className="page" style={styles.page}>
       <div className="container" style={styles.container}>
-        {enableYoutube && <Tabs tabs={tabs} onTabSelected={setWorkflowTab} />}
         <div className="content" style={styles.content}>
-          {workflowTab === "Upload" && (
-            <WorkflowUploadComponent project$key={project} />
-          )}
-          {workflowTab === "YouTube" && <WorkflowYoutube />}
-          {showSteps && (
-            <div style={styles.steps}>
-              <WorkflowUploadStep
-                uploadComplete={uploadComplete}
-                uploadPercent={uploadPercent}
-                uploadError={uploadError}
-              />
-              {project != null
-                ? (
-                  <Suspense fallback={<EmptySteps />}>
-                    <WorkflowTranscribeStep project$key={project} />
-                    <WorkflowClipStep project$key={project} />
-                  </Suspense>
-                )
-                : <EmptySteps />}
-            </div>
-          )}
+          <div>
+            <h1>Processing video...</h1>
+          </div>
+          <div style={styles.steps}>
+            <WorkflowUploadStep
+              uploadComplete={uploadComplete}
+              uploadPercent={uploadPercent}
+              uploadError={uploadError}
+            />
+            {project != null
+              ? (
+                <Suspense fallback={<EmptySteps />}>
+                  <WorkflowTranscribeStep project$key={project} />
+                  <WorkflowClipStep project$key={project} />
+                </Suspense>
+              )
+              : <EmptySteps />}
+          </div>
         </div>
       </div>
     </div>

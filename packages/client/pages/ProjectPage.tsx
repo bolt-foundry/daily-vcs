@@ -61,26 +61,16 @@ const { useLazyLoadQuery } = ReactRelay;
 
 function ProjectPage() {
   const { routeParams } = useRouter();
-  // const { projectId } = routeParams; // TODO: route params don't work
-  const projectId = "1234"; // TEMP
-  const includeProject = projectId != null;
-  if (!projectId) {
-    return <CreateNewProject project$key={null} />;
-  }
+  const { projectId } = routeParams; // TODO: route params don't work
+  // if (!projectId) {
+  //   return <CreateNewProject project$key={null} />;
+  // }
   // const data = useLazyLoadQuery<ProjectPageOldQuery>(query, {
   //   projectId,
   //   includeProject,
   //   count: 10,
   // }) as ProjectPageOldQuery$data;
-  const data = {
-    project: {
-      id: "1234",
-      isReadyToView: true,
-      clips: {
-        edges: [],
-      },
-    },
-  };
+  
 
   const project = data.project;
   const loadedClipsCount = project?.clips?.edges?.length;
@@ -117,7 +107,7 @@ function ProjectPage() {
     return <ProjectView project$key={project} />;
   }
 
-  return <CreateNewProject project$key={project ? project : null} />;
+  // return <CreateNewProject project$key={project ? project : null} />;
 }
 
 export function ProjectPageWithFrame() {

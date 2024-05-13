@@ -7,14 +7,14 @@ import { getGoogleOauthUrl } from "lib/googleOauth.ts";
 
 const logger = getLogger(import.meta);
 export enum DeploymentTypes {
-  "WEB" = "WEB",
-  "INTERNAL" = "INTERNAL",
+  WEB = "WEB",
+  INTERNAL = "INTERNAL",
 }
 
 export enum DeploymentEnvs {
-  "DEVELOPMENT" = "DEVELOPMENT",
-  "STAGING" = "STAGING",
-  "PRODUCTION" = "PRODUCTION",
+  DEVELOPMENT = "DEVELOPMENT",
+  STAGING = "STAGING",
+  PRODUCTION = "PRODUCTION",
 }
 type Handler = (
   request: Request,
@@ -23,8 +23,8 @@ type Handler = (
 const routes = new Map<string, Handler>();
 
 for (const entry of appRoutes.entries()) {
-  const [path] = entry;
-  routes.set(path, clientRenderer);
+  const [path, { allowLoggedOut }] = entry;
+  routes.set(path, clientRenderer(allowLoggedOut));
 }
 
 routes.set("/resources/style.css", async () => {
@@ -48,29 +48,25 @@ routes.set("/build/Client.js", async () => {
 });
 
 routes.set("/login", async (...args) => {
-  const deploymentEnvironment = Deno.env.get("BF_ENV") ?? "DEVELOPMENT";
-  const redirectDomain = Deno.env.get("BF_AUTH_REDIRECT_DOMAIN") ??
-    "boltfoundry.wtf";
   const [req] = args;
   const url = new URL(req.url);
-  const hostname = url.hostname;
   const credential = url.searchParams.get("credential");
   if (credential) {
-    return clientRenderer(...args);
+    return clientRenderer(true)(...args);
   }
 
-  // switch (deploymentEnvironment) {
-  //   case DeploymentEnvs.DEVELOPMENT: {
-  //     return new Response(null, {
-  //       status: 302,
-  //       headers: {
-  //         location: `https://${redirectDomain}/login?hostname=${hostname}`,
-  //       },
-  //     });
-  //   }
-  // }
+  return clientRenderer(false)(...args);
+});
 
-  return clientRenderer(...args);
+routes.set("/logout", async (...args) => {
+  const headers = new Headers();
+  headers.append("Set-Cookie", "BF_AT=; Path=/; Max-Age=0");
+  headers.append("Set-Cookie", "BF_RT=; Path=/; Max-Age=0");
+  headers.append("location", "/");
+  return new Response(null, {
+    status: 302,
+    headers,
+  });
 });
 
 routes.set("/google/oauth/start", (req) => {

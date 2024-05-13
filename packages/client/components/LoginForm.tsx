@@ -36,18 +36,20 @@ function GoogleLoginButton() {
   const hostname = urlParams.get("hostname");
   const credential = urlParams.get("credential");
   useEffect(() => {
+    // TODO: We should redirect to the user's original page after login
     if (credential) {
       commit({
         variables: {
           credential,
         },
         onCompleted: () => {
-          navigate("/projects");
+          navigate("/projects/new");
         },
       });
     }
   }, [credential]);
 
+  // TODO: We should redirect to the user's original page after login
   const onLogin = (response: google.accounts.id.CredentialResponse) => {
     if (hostname) {
       const replUrl =
@@ -62,7 +64,7 @@ function GoogleLoginButton() {
         credential: response.credential,
       },
       onCompleted: () => {
-        navigate("/bf_projects");
+        navigate("/projects/new");
       },
     });
   };
