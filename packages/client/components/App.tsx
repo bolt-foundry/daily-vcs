@@ -9,7 +9,7 @@ import { LoginPage } from "packages/client/pages/LoginPage.tsx";
 import { InternalBfPage } from "packages/client/pages/InternalBfPage.tsx";
 // import * as PricingPageModule from "packages/client/pages/PricingPage.tsx";
 import { Marketing } from "packages/client/pages/MarketingPage.tsx";
-import { ProjectPageWithFrame } from "packages/client/pages/ProjectPage.tsx";
+import { ProjectPage } from "packages/client/pages/ProjectPage.tsx";
 // import * as ProjectPageOldModule from "packages/client/components/ProjectPageOld.tsx";
 // import * as ReviewPageModule from "packages/client/pages/ReviewPage.tsx";
 // import * as SignupPageModule from "packages/client/pages/SignupPage.tsx";
@@ -31,8 +31,8 @@ export const routes = new Map([
   ["/login", { Component: LoginPage, allowLoggedOut: true }],
   ["/internalBf", { Component: InternalBfPage }],
   ["/projects/new", { Component: ProjectNew }],
-  ["/projects", { Component: ProjectPageWithFrame }],
-  // ["/projects/:projectId?", { Component: ProjectPageWithFrame }],
+  ["/projects", { Component: ProjectPage }],
+  // ["/projects/:projectId?", { Component: ProjectPage }],
 ]);
 
 export function App() {

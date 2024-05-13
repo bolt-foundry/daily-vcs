@@ -63,6 +63,7 @@ function generateColors(dark = false) {
   const pallette = dark ? palletteDark : palletteLight;
   const adjustment = dark ? -defaultAdjustment : defaultAdjustment;
   return {
+    alwaysLight: color(constantColors.lightText),
     primaryColor: color(pallette.primary),
     secondaryColor: color(pallette.secondary),
     secondaryColor015: color(pallette.secondary, null, 0.15),
@@ -71,6 +72,7 @@ function generateColors(dark = false) {
     fourtharyColor: color(pallette.fourthary),
     fourtharyColor015: color(pallette.fourthary, null, 0.15),
     fourtharyColor030: color(pallette.fourthary, null, 0.3),
+    fourtharyColor060: color(pallette.fourthary, null, 0.6),
     logoBolt: color(pallette.primary),
     logoFoundry: color(pallette.secondary),
     accent: color(pallette.fourthary),

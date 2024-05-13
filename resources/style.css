@@ -1370,3 +1370,45 @@ input[type="range"].scrubber::-moz-range-thumb:active {
 .blog_page a:hover {
   text-decoration: underline;
 }
+
+/* Toast */
+.toast {
+  color: var(--alwaysLight);
+  overflow: hidden;
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 8px;
+  background-color: var(--transparentDark);
+  z-index: 1000;
+  transition: 500ms all ease;
+  transform: translateX(40%);
+  opacity: 0;
+}
+.toast.show {
+  transform: translateX(0%);
+  opacity: 1;
+}
+.toast-title {
+  font-size: 1.2em;
+  font-weight: 600;
+}
+.toast-text {
+  font-size: 0.8em;
+  font-weight: 400;
+}
+.toast-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  background-color: var(--fourtharyColor060);
+  transition: width 0.1s linear;
+}

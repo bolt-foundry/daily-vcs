@@ -1,5 +1,6 @@
 import { React } from "deps.ts";
 import { PageFrame } from "packages/client/components/PageFrame.tsx";
+import { Toast } from "packages/bfDs/Toast.tsx";
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
@@ -24,7 +25,7 @@ const styles: Record<string, React.CSSProperties> = {
     paddingTop: 50,
     boxSizing: "border-box",
   },
-}
+};
 
 export function ProjectNew() {
   return (
@@ -47,6 +48,14 @@ export function ProjectNew() {
               /> */
             }
             <ProjectUploader />
+            <button
+              onClick={() => {
+                globalThis.location.href = "/projects";
+              }}
+            >
+              Go to projects and show toast
+            </button>
+            <TempToastDemo />
           </div>
         </div>
       </div>
@@ -56,4 +65,14 @@ export function ProjectNew() {
 
 function ProjectUploader() {
   return <input type="file" />;
+}
+
+function TempToastDemo() {
+  const [showToast, setShowToast] = React.useState(false);
+  return (
+    <button onClick={() => setShowToast(!showToast)}>
+      Show toast immediately
+      <Toast shouldShow={showToast} timeout={3000}>Immediate toast</Toast>
+    </button>
+  );
 }

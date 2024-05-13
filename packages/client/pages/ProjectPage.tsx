@@ -3,10 +3,10 @@ import { React, ReactRelay } from "deps.ts";
 //   ProjectPageOldQuery,
 //   ProjectPageOldQuery$data,
 // } from "packages/__generated__/ProjectPageOldQuery.graphql.ts";
-import { CreateNewProject } from "packages/client/components/CreateNewProject.tsx";
 import { ProjectView } from "packages/client/components/ProjectView.tsx";
 import { useRouter } from "packages/client/contexts/RouterContext.tsx";
 import { PageFrame } from "packages/client/components/PageFrame.tsx";
+import { ProjectPageToast } from "packages/client/components/ProjectPageToast.tsx";
 
 const { useEffect, useMemo, useState } = React;
 const { useLazyLoadQuery } = ReactRelay;
@@ -59,7 +59,8 @@ const { useLazyLoadQuery } = ReactRelay;
 //   }
 // `;
 
-function ProjectPage() {
+export function ProjectPage() {
+  const [showToast, setShowToast] = useState(false);
   const { routeParams } = useRouter();
   const { projectId } = routeParams; // TODO: route params don't work
   // if (!projectId) {
@@ -70,7 +71,14 @@ function ProjectPage() {
   //   includeProject,
   //   count: 10,
   // }) as ProjectPageOldQuery$data;
-  
+  const data = {
+    project: {
+      isReadyToView: true,
+      clips: {
+        edges: [],
+      },
+    },
+  };
 
   const project = data.project;
   const loadedClipsCount = project?.clips?.edges?.length;
@@ -104,16 +112,11 @@ function ProjectPage() {
   // ReactRelay.useSubscription(subscriptionConfig);
 
   if (project?.isReadyToView) {
-    return <ProjectView project$key={project} />;
+    return (
+      <PageFrame xstyle={{ overflowY: "auto", flex: "auto" }}>
+        <ProjectView project$key={project} />
+        <ProjectPageToast shouldShow={project.isReadyToView} />
+      </PageFrame>
+    );
   }
-
-  // return <CreateNewProject project$key={project ? project : null} />;
-}
-
-export function ProjectPageWithFrame() {
-  return (
-    <PageFrame xstyle={{ overflowY: "auto", flex: "auto" }}>
-      <ProjectPage />
-    </PageFrame>
-  );
 }
