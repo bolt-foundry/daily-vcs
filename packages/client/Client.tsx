@@ -2,7 +2,7 @@ import { getLogger, React } from "deps.ts";
 import { ReactDOMClient } from "packages/client/deps.ts";
 import { App } from "packages/client/components/App.tsx";
 import { ErrorBoundary } from "packages/client/components/ErrorBoundary.tsx";
-import type { AppEnvironmentProps as EnvironmentProps } from "packages/client/contexts/AppEnvironmentContext.tsx";
+import type { ServerProps } from "packages/client/contexts/AppEnvironmentContext.tsx";
 import { Spinner } from "packages/bfDs/Spinner.tsx";
 import AppEnvironmentProvider from "packages/client/contexts/AppEnvironmentContext.tsx";
 // import { ensurePosthogClientIsSetUp } from "packages/events/mod.ts";
@@ -21,7 +21,7 @@ const styles = {
   },
 };
 
-export function Client(props: EnvironmentProps) {
+export function Client(props: ServerProps) {
   return (
     <ErrorBoundary>
       <Suspense

@@ -15,7 +15,6 @@ const logger = getLogger(import.meta);
 
 const AppEnvironmentContext = React.createContext<AppEnvironmentProps>({
   content: "",
-  currentViewer: {},
   featureFlags,
   featureVariants,
   GOOGLE_DEVELOPER_API_KEY: "",
@@ -32,11 +31,6 @@ export type AppEnvironmentProps = {
   HYPERDX_API_KEY?: string;
   POSTHOG_API_KEY?: string;
   content: string;
-  currentViewer: {
-    email?: string;
-    id?: string;
-    name?: string;
-  };
   featureFlags: typeof featureFlags;
   featureVariants: typeof featureVariants;
   initialPath: string;
@@ -62,6 +56,7 @@ export default function AppEnvironmentProvider(props: PropsWithChildren) {
   //     identifyPerson(currentViewerId);
   //   }
   // }, [currentViewerId]);
+  logger.debug("AppEnvironmentProvider: props", routeParams, queryParams);
 
   return (
     <AppEnvironmentContext.Provider value={appEnvironment}>

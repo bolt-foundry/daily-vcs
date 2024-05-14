@@ -10,12 +10,20 @@ import {
   decodeAndVerifyBfJwt,
   decodeAndVerifyGoogleToken,
 } from "packages/bfDb/classes/BfAuth.ts";
+import { cookie } from "packages/graphql/deps.ts";
+import { GraphQLContext } from "packages/graphql/graphql.ts";
+import { BfAccount } from "packages/bfDb/models/BfAccount.ts";
+import { getLogger } from "deps.ts";
+
+const logger = getLogger(import.meta);
 
 export class BfCurrentViewerCreationError extends Error {
   constructor(reason: string) {
     super(`BfCurrentViewer can't be created: ${reason}`);
   }
 }
+
+
 export abstract class BfCurrentViewer {
   __typename: string;
 

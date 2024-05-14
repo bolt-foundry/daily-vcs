@@ -31,8 +31,8 @@ export const routes = new Map([
   ["/login", { Component: LoginPage, allowLoggedOut: true }],
   ["/internalBf", { Component: InternalBfPage }],
   ["/projects/new", { Component: ProjectNew }],
-  ["/projects", { Component: ProjectPage }],
   ["/projects/:projectId?", { Component: ProjectPage }],
+  ["/projects", { Component: ProjectPage }],
 ]);
 
 export function App() {

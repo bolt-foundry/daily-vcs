@@ -66,6 +66,9 @@ export function ProjectNew() {
               /> */
             }
             <ProjectUploader
+              onSelect={(file) => {
+                console.log(file);
+              }}
               onUpload={() => {
                 commit({
                   variables: {
@@ -91,10 +94,10 @@ export function ProjectNew() {
   );
 }
 
-function ProjectUploader({ onUpload }) {
+function ProjectUploader({ onUpload, onSelect }) {
   return (
     <>
-      <input type="file" />
+      <input type="file" onChange={(e) => onSelect(e.target.files[0])} />
       <Button onClick={onUpload} />
     </>
   );

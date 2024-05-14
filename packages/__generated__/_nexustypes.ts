@@ -158,6 +158,7 @@ export interface NexusGenFieldTypes {
     startCursor: string | null; // String
   }
   Query: { // field return type
+    containerProject: NexusGenRootTypes['BfContainerProject'] | null; // BfContainerProject
     currentViewer: NexusGenRootTypes['BfCurrentViewer'] | null; // BfCurrentViewer
   }
   Actor: { // field return type
@@ -234,6 +235,7 @@ export interface NexusGenFieldTypeNames {
     startCursor: 'String'
   }
   Query: { // field return type name
+    containerProject: 'BfContainerProject'
     currentViewer: 'BfCurrentViewer'
   }
   Actor: { // field return type name
@@ -272,6 +274,11 @@ export interface NexusGenArgTypes {
     }
     switchAccount: { // args
       accountId: string; // ID!
+    }
+  }
+  Query: {
+    containerProject: { // args
+      id: string; // ID!
     }
   }
 }

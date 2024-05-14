@@ -156,5 +156,6 @@ type PageInfo {
 }
 
 type Query {
+  containerProject(id: ID!): BfContainerProject
   currentViewer: BfCurrentViewer
 }

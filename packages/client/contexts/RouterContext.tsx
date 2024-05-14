@@ -3,7 +3,7 @@ import { useAppEnvironment } from "packages/client/contexts/AppEnvironmentContex
 import { routes } from "packages/client/components/App.tsx";
 const logger = getLogger(import.meta);
 
-const { createContext, useContext, useState } = React;
+const { createContext, useContext, useState, useCallback } = React;
 export const registeredRoutes = new Set<string>();
 export const dynamicRoutes = new Set<string>();
 
@@ -109,13 +109,27 @@ export function RouterProvider(
   >,
 ) {
   const { initialPath } = useAppEnvironment();
-  const [currentRouteParams, setRouteParams] = useState(routeParams ?? {});
-  const [currentQueryParams, setQueryParams] = useState(queryParams ?? {});
-  const [currentPath, setCurrentPath] = useState(initialPath);
+  const initialState = {
+    currentPath: initialPath,
+    routeParams,
+    queryParams,
+  };
+
+  const [state, setState] = useState(initialState);
+
+  const updateState = useCallback((path: string, search: string) => {
+    const nextMatch = matchRouteWithParams(path);
+    const nextQueryParams = Object.fromEntries(new URLSearchParams(search));
+    setState({
+      currentPath: path,
+      routeParams: nextMatch.params,
+      queryParams: nextQueryParams,
+    });
+  }, [setState]);
 
   React.useEffect(() => {
     const handlePopState = () => {
-      setCurrentPath(globalThis.location.pathname);
+      updateState(globalThis.location.pathname, globalThis.location.search);
     };
     globalThis.addEventListener("popstate", handlePopState);
     return () => {
@@ -123,15 +137,9 @@ export function RouterProvider(
     };
   }, []);
 
-  React.useEffect(() => {
-    const nextMatch = matchRouteWithParams(currentPath);
-    setRouteParams(nextMatch.params);
-    setQueryParams(Object.fromEntries(new URLSearchParams(location.search)));
-  }, [currentPath]);
-
-  const navigate = (path: string) => {
+  const navigate = (path: string, search = "") => {
     globalThis.history.pushState(null, "", path);
-    setCurrentPath(path);
+    updateState(path, search);
   };
 
   // add all routes to the router context
@@ -140,9 +148,7 @@ export function RouterProvider(
   return (
     <RouterContext.Provider
       value={{
-        currentPath,
-        routeParams: currentRouteParams,
-        queryParams: currentQueryParams,
+        ...state,
         navigate,
       }}
     >
