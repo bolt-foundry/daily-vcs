@@ -51,10 +51,8 @@ routes.set("/login", (...args) => {
   const [req] = args;
   const url = new URL(req.url);
   const credential = url.searchParams.get("credential");
-  if (credential) {
-    return clientRenderer(true)(...args);
-  }
-  if (Deno.env.get('BF_ENV') === "PRODUCTION") {
+  const dontRedirect = credential || Deno.env.get("BF_ENV") !== "DEVELOPMENT";
+  if (dontRedirect) {
     return clientRenderer(true)(...args);
   }
 
