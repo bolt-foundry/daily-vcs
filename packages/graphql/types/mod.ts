@@ -7,9 +7,8 @@
  */
 
 export * from "packages/graphql/types/BfGraphQLAccount.ts";
+export * from "packages/graphql/types/BfGraphQLContainerProject.ts";
 export * from "packages/graphql/types/BfGraphQLCurrentViewer.ts";
-// export * from "packages/graphql/types/BfGraphQLMedia.ts";
-// export * from "packages/graphql/types/BfGraphQLMediaGoogleDrive.ts";
 export * from "packages/graphql/types/BfGraphQLNode.ts";
 export * from "packages/graphql/types/BfGraphQLOrganization.ts";
 export * from "packages/graphql/types/BfGraphQLPerson.ts";

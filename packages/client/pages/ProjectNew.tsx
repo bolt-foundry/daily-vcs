@@ -1,6 +1,19 @@
 import { React } from "deps.ts";
+import { graphql, ReactRelay } from "packages/client/deps.ts";
 import { PageFrame } from "packages/client/components/PageFrame.tsx";
 import { Toast } from "packages/bfDs/Toast.tsx";
+import { Button } from "packages/bfDs/Button.tsx";
+import { ProjectNewCreateNewProjectMutation } from "packages/__generated__/ProjectNewCreateNewProjectMutation.graphql.ts";
+
+const { useMutation } = ReactRelay;
+
+const mutation = await graphql`
+  mutation ProjectNewCreateNewProjectMutation($name: String!) {
+    createProject(name: $name) {
+      id
+    }
+  }
+`;
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
@@ -28,6 +41,9 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export function ProjectNew() {
+  const [commit] = useMutation<ProjectNewCreateNewProjectMutation>(mutation);
+  const [name, setName] = React.useState("");
+  const [error, setError] = React.useState("");
   return (
     <PageFrame>
       <div className="page" style={styles.page}>
@@ -47,14 +63,24 @@ export function ProjectNew() {
                 maxSizeMB={2000}
               /> */
             }
-            <ProjectUploader />
-            <button
-              onClick={() => {
-                globalThis.location.href = "/projects";
+            <ProjectUploader
+              onUpload={() => {
+                commit({
+                  variables: {
+                    name: "test",
+                  },
+                  onCompleted: (response) => {
+                    const id = response.createProject?.id;
+                    window.location.href = `/projects/${id}`;
+                  },
+                  onError: (err) => {
+                    setError(err.message)
+                  },
+                });
               }}
-            >
-              Go to projects and show toast
-            </button>
+            />
+
+            <Toast shouldShow={error != ""} timeout={10000}>{error}</Toast>
             <TempToastDemo />
           </div>
         </div>
@@ -63,8 +89,13 @@ export function ProjectNew() {
   );
 }
 
-function ProjectUploader() {
-  return <input type="file" />;
+function ProjectUploader({ onUpload }) {
+  return (
+    <>
+      <input type="file" />
+      <Button onClick={onUpload} />
+    </>
+  );
 }
 
 function TempToastDemo() {
