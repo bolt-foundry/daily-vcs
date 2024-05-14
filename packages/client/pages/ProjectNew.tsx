@@ -42,7 +42,7 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export function ProjectNew() {
-  const {navigate} = useRouter();
+  const { navigate } = useRouter();
   const [commit] = useMutation<ProjectNewCreateNewProjectMutation>(mutation);
   const [name, setName] = React.useState("");
   const [error, setError] = React.useState("");
@@ -79,7 +79,7 @@ export function ProjectNew() {
                     navigate(`/projects/${id}`);
                   },
                   onError: (err) => {
-                    setError(err.message)
+                    setError(err.message);
                   },
                 });
               }}
@@ -87,6 +87,7 @@ export function ProjectNew() {
 
             <Toast shouldShow={error != ""} timeout={10000}>{error}</Toast>
             <TempToastDemo />
+            <TempToastDemo2 />
           </div>
         </div>
       </div>
@@ -106,13 +107,35 @@ function ProjectUploader({ onUpload, onSelect }) {
 function TempToastDemo() {
   const [showToast, setShowToast] = React.useState(false);
   return (
-    <button onClick={() => setShowToast(!showToast)}>
-      Show toast immediately
-      <Toast 
-        shouldShow={showToast} 
-        timeout={3000} 
-        timeoutCallback={() => setShowToast(false)}
-      >Immediate toast</Toast>
-    </button>
+    <>
+      <button onClick={() => setShowToast(!showToast)}>
+        Show toast immediately
+      </button>
+      <Toast
+        shouldShow={showToast}
+        timeout={3000}
+        closeCallback={() => setShowToast(false)}
+      >
+        Immediate toast
+      </Toast>
+    </>
+  );
+}
+
+function TempToastDemo2() {
+  const [showToast, setShowToast] = React.useState(false);
+  return (
+    <>
+      <button onClick={() => setShowToast(!showToast)}>
+        Show toast immediately
+      </button>
+      <Toast
+        shouldShow={showToast}
+        title="Toasty"
+        closeCallback={() => setShowToast(false)}
+      >
+        Closeable toast
+      </Toast>
+    </>
   );
 }

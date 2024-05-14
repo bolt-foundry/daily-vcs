@@ -1384,7 +1384,8 @@ input[type="range"].scrubber::-moz-range-thumb:active {
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  padding: 20px 40px;
+  padding: 20px 30px;
+  padding-right: 50px;
   border-radius: 8px;
   background-color: var(--transparentDark);
   z-index: 1000;
@@ -1396,13 +1397,14 @@ input[type="range"].scrubber::-moz-range-thumb:active {
   transform: translateX(0%);
   opacity: 1;
 }
+.close-toast {
+  position: absolute;
+  right: 15px;
+  top: 20px;
+}
 .toast-title {
   font-size: 1.2em;
   font-weight: 600;
-}
-.toast-text {
-  font-size: 0.8em;
-  font-weight: 400;
 }
 .toast-progress {
   position: absolute;

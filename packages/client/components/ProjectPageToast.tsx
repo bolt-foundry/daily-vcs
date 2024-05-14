@@ -39,14 +39,14 @@ export function ProjectPageToast({ shouldShow }: Props) {
   // fake progress
   useEffect(() => {
     const increaseProgress = async () => {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       if (uploading < 1) {
-        setUploading(prev => Math.min(prev + 0.34, 1));
+        setUploading((prev) => Math.min(prev + 0.34, 1));
       } else if (transcribing < 1) {
-        setTranscribing(prev => Math.min(prev + 0.34, 1));
+        setTranscribing((prev) => Math.min(prev + 0.34, 1));
       } else if (clipping < 1) {
-        setClipping(prev => Math.min(prev + 0.34, 1));
+        setClipping((prev) => Math.min(prev + 0.34, 1));
       }
     };
 
@@ -54,11 +54,8 @@ export function ProjectPageToast({ shouldShow }: Props) {
   }, [uploading, transcribing, clipping]);
 
   return (
-    <Toast shouldShow={showToast}>
-      <div className="toast-title">
-        Project status
-      </div>
-      <div className="toast-text" style={styles.statuses}>
+    <Toast shouldShow={showToast} title="Project status">
+      <div style={styles.statuses}>
         <div style={styles.status}>
           <Progress
             size={16}
