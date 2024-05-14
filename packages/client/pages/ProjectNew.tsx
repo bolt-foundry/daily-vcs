@@ -4,6 +4,7 @@ import { PageFrame } from "packages/client/components/PageFrame.tsx";
 import { Toast } from "packages/bfDs/Toast.tsx";
 import { Button } from "packages/bfDs/Button.tsx";
 import { ProjectNewCreateNewProjectMutation } from "packages/__generated__/ProjectNewCreateNewProjectMutation.graphql.ts";
+import { useRouter } from "packages/client/contexts/RouterContext.tsx";
 
 const { useMutation } = ReactRelay;
 
@@ -41,6 +42,7 @@ const styles: Record<string, React.CSSProperties> = {
 };
 
 export function ProjectNew() {
+  const {navigate} = useRouter();
   const [commit] = useMutation<ProjectNewCreateNewProjectMutation>(mutation);
   const [name, setName] = React.useState("");
   const [error, setError] = React.useState("");
@@ -71,7 +73,7 @@ export function ProjectNew() {
                   },
                   onCompleted: (response) => {
                     const id = response.createProject?.id;
-                    window.location.href = `/projects/${id}`;
+                    navigate(`/projects/${id}`);
                   },
                   onError: (err) => {
                     setError(err.message)
