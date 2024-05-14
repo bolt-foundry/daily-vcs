@@ -32,7 +32,7 @@ export const routes = new Map([
   ["/internalBf", { Component: InternalBfPage }],
   ["/projects/new", { Component: ProjectNew }],
   ["/projects", { Component: ProjectPage }],
-  // ["/projects/:projectId?", { Component: ProjectPage }],
+  ["/projects/:projectId?", { Component: ProjectPage }],
 ]);
 
 export function App() {

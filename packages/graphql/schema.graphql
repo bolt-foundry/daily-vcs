@@ -55,6 +55,13 @@ type BfAccountEdge {
   node: BfAccount
 }
 
+"""A collection of media and stuff"""
+type BfContainerProject implements BfNode {
+  """Unique identifier for the resource"""
+  id: ID!
+  name: String
+}
+
 """
 The person acting on this request. The actor can be an organiazation or person. The role is the role of the actor in the organization. The person is the person who is acting.
 """
@@ -116,6 +123,7 @@ type BfPerson implements Actor & BfNode {
 }
 
 type Mutation {
+  createProject(name: String!): BfContainerProject
   linkGoogleAccount(code: String!): BfCurrentViewer
   loginWithGoogle(credential: String!): BfCurrentViewerAccessToken
   logout: BfCurrentViewer
