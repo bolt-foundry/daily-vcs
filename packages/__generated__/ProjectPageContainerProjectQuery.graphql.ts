@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0697fab2858e0f9f2df40c603bfaa4d5>>
+ * @generated SignedSource<<a1a6c112ff69740974f1b45ef3c2f526>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,13 +9,13 @@
 // @ts-nocheck
 
 import { ConcreteRequest, Query } from 'relay-runtime';
+import { FragmentRefs } from "relay-runtime";
 export type ProjectPageContainerProjectQuery$variables = {
   id: string;
 };
 export type ProjectPageContainerProjectQuery$data = {
   readonly containerProject: {
-    readonly id: string;
-    readonly name: string | null | undefined;
+    readonly " $fragmentSpreads": FragmentRefs<"ProjectView_containerProject">;
   } | null | undefined;
 };
 export type ProjectPageContainerProjectQuery = {
@@ -33,35 +33,9 @@ var v0 = [
 ],
 v1 = [
   {
-    "alias": null,
-    "args": [
-      {
-        "kind": "Variable",
-        "name": "id",
-        "variableName": "id"
-      }
-    ],
-    "concreteType": "BfContainerProject",
-    "kind": "LinkedField",
-    "name": "containerProject",
-    "plural": false,
-    "selections": [
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "id",
-        "storageKey": null
-      },
-      {
-        "alias": null,
-        "args": null,
-        "kind": "ScalarField",
-        "name": "name",
-        "storageKey": null
-      }
-    ],
-    "storageKey": null
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "id"
   }
 ];
 return {
@@ -70,7 +44,24 @@ return {
     "kind": "Fragment",
     "metadata": null,
     "name": "ProjectPageContainerProjectQuery",
-    "selections": (v1/*: any*/),
+    "selections": [
+      {
+        "alias": null,
+        "args": (v1/*: any*/),
+        "concreteType": "BfContainerProject",
+        "kind": "LinkedField",
+        "name": "containerProject",
+        "plural": false,
+        "selections": [
+          {
+            "args": null,
+            "kind": "FragmentSpread",
+            "name": "ProjectView_containerProject"
+          }
+        ],
+        "storageKey": null
+      }
+    ],
     "type": "Query",
     "abstractKey": null
   },
@@ -79,19 +70,45 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "kind": "Operation",
     "name": "ProjectPageContainerProjectQuery",
-    "selections": (v1/*: any*/)
+    "selections": [
+      {
+        "alias": null,
+        "args": (v1/*: any*/),
+        "concreteType": "BfContainerProject",
+        "kind": "LinkedField",
+        "name": "containerProject",
+        "plural": false,
+        "selections": [
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "name",
+            "storageKey": null
+          },
+          {
+            "alias": null,
+            "args": null,
+            "kind": "ScalarField",
+            "name": "id",
+            "storageKey": null
+          }
+        ],
+        "storageKey": null
+      }
+    ]
   },
   "params": {
-    "cacheID": "37e12fb02df394bb71993c86f12da2d9",
+    "cacheID": "5aa0aa8a17b691bb1602c58f456c1128",
     "id": null,
     "metadata": {},
     "name": "ProjectPageContainerProjectQuery",
     "operationKind": "query",
-    "text": "query ProjectPageContainerProjectQuery(\n  $id: ID!\n) {\n  containerProject(id: $id) {\n    id\n    name\n  }\n}\n"
+    "text": "query ProjectPageContainerProjectQuery(\n  $id: ID!\n) {\n  containerProject(id: $id) {\n    ...ProjectView_containerProject\n    id\n  }\n}\n\nfragment ProjectView_containerProject on BfContainerProject {\n  name\n}\n"
   }
 };
 })();
 
-(node as any).hash = "e37c53fa52a39e455e2347eedd0ec4cc";
+(node as any).hash = "52d865b4b3955970adb8b9fc3c20f736";
 
 export default node;

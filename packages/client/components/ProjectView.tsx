@@ -1,20 +1,15 @@
-import { project as fakeData } from "packages/client/fakeData/ProjectPageOldQuery.js";
 import { React, ReactRelay } from "deps.ts";
 import { ClipListNull } from "packages/client/components/ClipListNull.tsx";
 import { ClipList } from "packages/client/components/ClipList.tsx";
-import { VideoPlayer } from "packages/client/components/VideoPlayer.tsx";
-// import {
-//   ProjectView_project$data,
-//   ProjectView_project$key,
-// } from "packages/__generated__/ProjectView_project.graphql.ts";
-import { Playbar } from "packages/client/components/Playbar.tsx";
-import usePrevious from "packages/client/hooks/usePrevious.ts";
+
 import { DeleteProjectButton } from "packages/client/components/DeleteProjectButton.tsx";
 import { classnames } from "lib/classnames.ts";
 import { ProjectTitle } from "packages/client/components/ProjectTitle.tsx";
 import { SettingsProjectSidebar } from "packages/client/components/SettingsProjectSidebar.tsx";
+import { graphql } from "packages/client/deps.ts";
+import { ProjectView_containerProject$key } from "packages/__generated__/ProjectView_containerProject.graphql.ts";
 
-const { useEffect, useState } = React;
+const { useState } = React;
 const { useFragment } = ReactRelay;
 
 const styles: Record<string, React.CSSProperties> = {
@@ -40,60 +35,25 @@ const styles: Record<string, React.CSSProperties> = {
   },
 };
 
-// const fragment = await graphql`
-//   fragment ProjectView_project on Project {
-//     ...ClipList_project
-//     ...Playbar_project
-//     ...ProjectTitle_project
-//     ...SettingsProjectSidebarQuery_project
-//     id
-//     name
-//     ratio
-//     opurl
-//     clips(
-//       first: $count,
-//       after: $cursor
-//     ) @connection(key: "ClipList_project_clips") {
-//       edges {
-//         node {
-//           __typename
-//         }
-//       }
-//       pageInfo {
-//         endCursor
-//         hasNextPage
-//         hasPreviousPage
-//         startCursor
-//       }
-//     }
-//     videoUrl
-//   }
-// `;
+const fragment = await graphql`
+  fragment ProjectView_containerProject on BfContainerProject {
+    name
+  }
+`
 
+type Props = {
+  containerProject$key: ProjectView_containerProject$key;
+}
 export function ProjectView(
-  { project$key }: { project$key: ProjectView_project$key },
+  { containerProject$key }: Props,
 ) {
   const [selectedClipId, setSelectedClipId] = useState<string | null>(
     null,
   );
-  const [isTrueClient, setIsTrueClient] = useState<boolean>(false);
-  // const data = useFragment(
-  //   fragment,
-  //   project$key,
-  // ) as ProjectView_project$data;
-  const data = fakeData.data.project;
-  const previousProjectId = usePrevious(data.id);
-  // @ts-expect-error #techdebt
-  const [videoSrcCache, setVideoSrcCache] = useState<string | null>(data.opurl);
-
-  // set videoSrcCache when data.videoUrl is available
-  // this is needed because the videoUrl changes with every fetch
-  useEffect(() => {
-    if (previousProjectId !== data.id) {
-      // @ts-expect-error #techdebt
-      setVideoSrcCache(data.opurl ?? data.videoUrl);
-    }
-  }, [data.opurl, data.videoUrl, data.id, previousProjectId]);
+  const data = useFragment(
+    fragment,
+    containerProject$key,
+  );
 
   if (!data) return <div>Missing project data</div>;
 
@@ -120,11 +80,11 @@ export function ProjectView(
         <div className="mobile-hide">
           <div className="header flexRow flexCenter" style={{ gap: 26 }}>
             <div className={videoClasses}>
-              <VideoPlayer
+              {/* <VideoPlayer
                 src={videoSrcCache ?? data.opurl ?? data.videoUrl}
                 xstyle={{ borderRadius: 8 }}
                 playerLocation="projectView"
-              />
+              /> */}
             </div>
             <div style={{ flex: 1 }}>
               <ProjectTitle project$key={data} />
@@ -137,9 +97,9 @@ export function ProjectView(
             </div>
           </div> */
               }
-              {showPlaybar && (
+              {/* {showPlaybar && (
                 <Playbar project$key={data} handleGotoClip={handleGotoClip} />
-              )}
+              )} */}
             </div>
             <DeleteProjectButton
               projectId={data.id}
@@ -170,7 +130,7 @@ export function ProjectView(
             <ClipList
               project$key={data}
               gotoClip={selectedClipId}
-              videoSrc={videoSrcCache ?? data?.opurl ?? data?.videoUrl ?? ""}
+              /* videoSrc={videoSrcCache ?? data?.opurl ?? data?.videoUrl ?? ""} */
             />
           )
           : <ClipListNull />}
