@@ -8,12 +8,14 @@ const { useState, useEffect } = React;
 type ToastProps = {
   shouldShow: boolean;
   timeout?: number;
+  timeoutCallback?: () => void;
 };
 
 export function Toast({
   children,
   shouldShow,
   timeout,
+  timeoutCallback,
 }: React.PropsWithChildren<ToastProps>) {
   const [show, setShow] = useState(false);
   const [inDOM, setInDOM] = useState(false);
@@ -24,8 +26,15 @@ export function Toast({
     let domTimer: number;
     let progressInterval: number;
 
+    function removeToast() {
+      setShow(false);
+      domTimer = setTimeout(() => {
+        setInDOM(false);
+        timeoutCallback()
+      }, 500);
+    }
+
     if (shouldShow) {
-      console.log("showing toast");
       setInDOM(true);
       setProgress(100);
       visibilityTimer = setTimeout(() => setShow(true), 10);
@@ -39,14 +48,11 @@ export function Toast({
         }, 10);
 
         domTimer = setTimeout(() => {
-          setShow(false); // Start hide transition after timeout
-          setTimeout(() => setInDOM(false), 500); // Remove from DOM after hide transition
+          removeToast();
         }, timeout);
       }
     } else {
-      console.log("hiding toast");
-      setShow(false);
-      domTimer = setTimeout(() => setInDOM(false), 500);
+      removeToast();
     }
 
     return () => {

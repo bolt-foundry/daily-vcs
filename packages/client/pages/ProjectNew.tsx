@@ -105,7 +105,11 @@ function TempToastDemo() {
   return (
     <button onClick={() => setShowToast(!showToast)}>
       Show toast immediately
-      <Toast shouldShow={showToast} timeout={3000}>Immediate toast</Toast>
+      <Toast 
+        shouldShow={showToast} 
+        timeout={3000} 
+        timeoutCallback={() => setShowToast(false)}
+      >Immediate toast</Toast>
     </button>
   );
 }
