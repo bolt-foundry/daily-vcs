@@ -162,6 +162,22 @@ Deno.serve(async (req) => {
   logger.info(
     `Incoming request: ${req.method} ${incomingUrl.pathname}`,
   );
-  const handler = routes.get(incomingUrl.pathname) ?? defaultRoute;
-  return await handler(req);
+  // Attempt to match routes with optional URL params
+  const pathWithParams = incomingUrl.pathname.split("?")[0];
+  let matchedHandler = routes.get(pathWithParams);
+  if (!matchedHandler) {
+    // If no direct match, try matching with optional params
+    for (const [routePath, routeHandler] of routes) {
+      const regexPath =
+        routePath.replace(/:\w+\??/g, "([^/]+)").replace(/\?$/, "") + "($|/)";
+      const match = pathWithParams.match(new RegExp(`^${regexPath}`));
+      if (match) {
+        matchedHandler = routeHandler;
+        break;
+      }
+    }
+  }
+  // Use the matched handler if found, otherwise use the default route
+  matchedHandler = matchedHandler || defaultRoute;
+  return await matchedHandler(req);
 });
