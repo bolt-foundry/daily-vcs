@@ -546,6 +546,12 @@
         "location": "/std@0.224.0/fs/mod.ts",
         "x-deno-warning": "Implicitly using latest version (0.224.0) for https://deno.land/std/fs/mod.ts"
       }
+    },
+    "https://esm.sh/@replit/extensions@1.8.0": {
+      "headers": {
+        "content-type": "application/javascript; charset=utf-8",
+        "x-typescript-types": "https://esm.sh/v135/@replit/extensions@1.8.0/dist/index.d.ts"
+      }
     }
   }
 }
