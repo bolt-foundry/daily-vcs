@@ -54,7 +54,7 @@ async function checkSchema() {
   }
 }
 
-await checkSchema();
+// await checkSchema();
 
 type Props = Record<string, unknown>;
 type Row<
