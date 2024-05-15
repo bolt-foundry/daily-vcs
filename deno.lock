@@ -13,6 +13,7 @@
       "npm:react-relay@16.1.0": "npm:react-relay@16.1.0_react@18.2.0",
       "npm:react@18.2": "npm:react@18.2.0",
       "npm:relay-compiler": "npm:relay-compiler@16.2.0",
+      "npm:relay-runtime": "npm:relay-runtime@16.1.0",
       "npm:relay-runtime@16.1.0": "npm:relay-runtime@16.1.0"
     },
     "jsr": {

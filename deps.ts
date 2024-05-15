@@ -1,9 +1,12 @@
 // @deno-types="https://esm.sh/v135/@types/react-relay@16.0.6/index.d.ts";
 export * as ReactRelay from "react-relay";
-export * as RelayRuntime from "relay-runtime";
+// @deno-types="https://esm.sh/v135/@types/relay-runtime@14.1.23/index.d.ts";
+import * as RelayRuntime from "relay-runtime";
 // @deno-types="https://esm.sh/v135/@types/react@18.2.38/index.d.ts";
 import * as React from "react";
 export * as rxjs from "https://esm.sh/rxjs@7.8.1";
+export { RelayRuntime }
+RelayRuntime.RelayFeatureFlags.ENABLE_RELAY_RESOLVERS = true;
 
 // log stuff and random exports
 

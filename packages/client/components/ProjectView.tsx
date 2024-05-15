@@ -38,6 +38,8 @@ const styles: Record<string, React.CSSProperties> = {
 const fragment = await graphql`
   fragment ProjectView_containerProject on BfContainerProject {
     name
+    opurl
+    ...BfContainerProjectResolverOpurlResolver
   }
 `
 
@@ -54,6 +56,8 @@ export function ProjectView(
     fragment,
     containerProject$key,
   );
+
+  console.log(data);
 
   if (!data) return <div>Missing project data</div>;
 
@@ -88,7 +92,7 @@ export function ProjectView(
             </div>
             <div style={{ flex: 1 }}>
               <ProjectTitle project$key={data} />
-              {/* <div className="headerSubtext">{data.originalFilename}</div> */}
+              <div className="headerSubtext">{data.name} {data.opurl}</div>
               {
                 /* <div style={styles.meta}>
             <div style={styles.stat}>

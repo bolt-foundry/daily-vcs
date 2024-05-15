@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a1a6c112ff69740974f1b45ef3c2f526>>
+ * @generated SignedSource<<0f67104ddef3ed21bf67d7452f5393fb>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -37,7 +37,14 @@ v1 = [
     "name": "id",
     "variableName": "id"
   }
-];
+],
+v2 = {
+  "alias": null,
+  "args": null,
+  "kind": "ScalarField",
+  "name": "id",
+  "storageKey": null
+};
 return {
   "fragment": {
     "argumentDefinitions": (v0/*: any*/),
@@ -87,24 +94,33 @@ return {
             "storageKey": null
           },
           {
-            "alias": null,
+            "name": "opurl",
             "args": null,
-            "kind": "ScalarField",
-            "name": "id",
-            "storageKey": null
-          }
+            "fragment": {
+              "kind": "InlineFragment",
+              "selections": [
+                (v2/*: any*/)
+              ],
+              "type": "BfContainerProject",
+              "abstractKey": null
+            },
+            "kind": "RelayResolver",
+            "storageKey": null,
+            "isOutputType": true
+          },
+          (v2/*: any*/)
         ],
         "storageKey": null
       }
     ]
   },
   "params": {
-    "cacheID": "5aa0aa8a17b691bb1602c58f456c1128",
+    "cacheID": "19ac5552ac9b834ac4939431c529f101",
     "id": null,
     "metadata": {},
     "name": "ProjectPageContainerProjectQuery",
     "operationKind": "query",
-    "text": "query ProjectPageContainerProjectQuery(\n  $id: ID!\n) {\n  containerProject(id: $id) {\n    ...ProjectView_containerProject\n    id\n  }\n}\n\nfragment ProjectView_containerProject on BfContainerProject {\n  name\n}\n"
+    "text": "query ProjectPageContainerProjectQuery(\n  $id: ID!\n) {\n  containerProject(id: $id) {\n    ...ProjectView_containerProject\n    id\n  }\n}\n\nfragment BfContainerProjectResolverOpurlResolver on BfContainerProject {\n  id\n}\n\nfragment ProjectView_containerProject on BfContainerProject {\n  name\n  ...BfContainerProjectResolverOpurlResolver\n}\n"
   }
 };
 })();

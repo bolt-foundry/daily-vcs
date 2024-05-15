@@ -249,8 +249,7 @@ export const denoPlugin = {
         }
 
         case "npm:": {
-          const specifierWithNoSlash = url.pathname.split("/")[0] ??
-            url.pathname;
+          const [specifierWithNoSlash, ...rest] = url.pathname.split("/")
           const specifier = `npm:${specifierWithNoSlash}`;
           const resolvedSpecifier = denoLock.packages.specifiers[specifier];
           logger.debug(
@@ -268,14 +267,21 @@ export const denoPlugin = {
           const main = packageJson.main ?? "index.js";
           let mainPath = join(packagePath, main);
           //  check if mainPath is a directory
-          try {
-            const stat = await Deno.stat(mainPath);
-            if (stat.isDirectory) {
-              mainPath = join(mainPath, "index.js");
-            }
-          } catch {
-            // do nothing
+          const stat = await Deno.stat(mainPath);
+          if (stat.isDirectory) {
+            mainPath = join(mainPath, "index.js");
           }
+
+          
+          if (rest.length > 2) {
+            const restPath = rest.join("/");
+            const completeRestPath = join(packagePath, restPath);
+            const restPathStat = await Deno.stat(completeRestPath);
+            if (restPathStat.isFile) {
+              mainPath = completeRestPath;
+            }
+          }
+
 
           return {
             path: mainPath,

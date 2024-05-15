@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<a375684485bffebce912485bb27c3c8a>>
+ * @generated SignedSource<<8e3fcd756b5b1451b1e191b252500c71>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,9 +9,13 @@
 // @ts-nocheck
 
 import { Fragment, ReaderFragment } from 'relay-runtime';
+import * as _____client_relay_localResolvers_BfContainerProjectResolver from "packages/client/relay/localResolvers/BfContainerProjectResolver.ts";
 import { FragmentRefs } from "relay-runtime";
+import { opurl as bfContainerProjectOpurlResolverType } from "../client/relay/localResolvers/BfContainerProjectResolver.ts";
 export type ProjectView_containerProject$data = {
   readonly name: string | null | undefined;
+  readonly opurl: string | null | undefined;
+  readonly " $fragmentSpreads": FragmentRefs<"BfContainerProjectResolverOpurlResolver">;
   readonly " $fragmentType": "ProjectView_containerProject";
 };
 export type ProjectView_containerProject$key = {
@@ -19,7 +23,13 @@ export type ProjectView_containerProject$key = {
   readonly " $fragmentSpreads": FragmentRefs<"ProjectView_containerProject">;
 };
 
-const node: ReaderFragment = {
+const node: ReaderFragment = (function(){
+var v0 = {
+  "args": null,
+  "kind": "FragmentSpread",
+  "name": "BfContainerProjectResolverOpurlResolver"
+};
+return {
   "argumentDefinitions": [],
   "kind": "Fragment",
   "metadata": null,
@@ -31,12 +41,23 @@ const node: ReaderFragment = {
       "kind": "ScalarField",
       "name": "name",
       "storageKey": null
-    }
+    },
+    {
+      "alias": null,
+      "args": null,
+      "fragment": (v0/*: any*/),
+      "kind": "RelayResolver",
+      "name": "opurl",
+      "resolverModule": _____client_relay_localResolvers_BfContainerProjectResolver.opurl,
+      "path": "opurl"
+    },
+    (v0/*: any*/)
   ],
   "type": "BfContainerProject",
   "abstractKey": null
 };
+})();
 
-(node as any).hash = "b3c08e8416c02fad02d5152a954b81bc";
+(node as any).hash = "5d5be5927bc419f93e4c1487b8be20be";
 
 export default node;

@@ -26,7 +26,7 @@ if (!databaseUrl) {
 const sql = neon(databaseUrl);
 // const pool = new postgres.Pool(databaseUrl, DB_POOL_MAX_CONNECTIONS, true);
 
-async function checkSchema() {
+export async function checkSchema() {
   const schemaUrl = new URL(import.meta.resolve("packages/bfDb/schema.sql"));
   const sqlText = await Deno.readTextFile(schemaUrl);
   // Execute table creation separately
