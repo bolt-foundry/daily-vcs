@@ -43,7 +43,6 @@ export interface NexusGenScalars {
 export interface NexusGenObjects {
   BfAccount: { // root type
     displayName?: string | null; // String
-    id: string; // ID!
     organizationBfGid?: string | null; // ID
     personBfGid?: string | null; // ID
     role?: NexusGenEnums['AccountRole'] | null; // AccountRole
@@ -58,7 +57,6 @@ export interface NexusGenObjects {
     node?: NexusGenRootTypes['BfAccount'] | null; // BfAccount
   }
   BfContainerProject: { // root type
-    id: string; // ID!
     name?: string | null; // String
   }
   BfCurrentViewerAccessToken: { // root type
@@ -67,13 +65,12 @@ export interface NexusGenObjects {
   BfCurrentViewerAnon: { // root type
     role?: NexusGenEnums['AccountRole'] | null; // AccountRole
   }
+  BfMediaBffsFile: {};
   BfOrganization: { // root type
-    id: string; // ID!
     name?: string | null; // String
   }
   BfPerson: { // root type
     email?: string | null; // String
-    id: string; // ID!
     name?: string | null; // String
   }
   Mutation: {};
@@ -89,7 +86,8 @@ export interface NexusGenObjects {
 export interface NexusGenInterfaces {
   Actor: core.Discriminate<'BfOrganization', 'required'> | core.Discriminate<'BfPerson', 'required'>;
   BfCurrentViewer: core.Discriminate<'BfCurrentViewerAccessToken', 'required'> | core.Discriminate<'BfCurrentViewerAnon', 'required'>;
-  BfNode: core.Discriminate<'BfAccount', 'required'> | core.Discriminate<'BfContainerProject', 'required'> | core.Discriminate<'BfOrganization', 'required'> | core.Discriminate<'BfPerson', 'required'>;
+  BfMedia: core.Discriminate<'BfMediaBffsFile', 'required'>;
+  BfNode: core.Discriminate<'BfAccount', 'required'> | core.Discriminate<'BfContainerProject', 'required'> | core.Discriminate<'BfMediaBffsFile', 'required'> | core.Discriminate<'BfOrganization', 'required'> | core.Discriminate<'BfPerson', 'required'>;
 }
 
 export interface NexusGenUnions {
@@ -134,6 +132,9 @@ export interface NexusGenFieldTypes {
     person: NexusGenRootTypes['BfPerson'] | null; // BfPerson
     role: NexusGenEnums['AccountRole'] | null; // AccountRole
   }
+  BfMediaBffsFile: { // field return type
+    id: string; // ID!
+  }
   BfOrganization: { // field return type
     id: string; // ID!
     name: string | null; // String
@@ -145,6 +146,7 @@ export interface NexusGenFieldTypes {
     name: string | null; // String
   }
   Mutation: { // field return type
+    createBfMediaBffsFile: NexusGenRootTypes['BfMediaBffsFile'] | null; // BfMediaBffsFile
     createProject: NexusGenRootTypes['BfContainerProject'] | null; // BfContainerProject
     linkGoogleAccount: NexusGenRootTypes['BfCurrentViewer'] | null; // BfCurrentViewer
     loginWithGoogle: NexusGenRootTypes['BfCurrentViewerAccessToken'] | null; // BfCurrentViewerAccessToken
@@ -170,6 +172,9 @@ export interface NexusGenFieldTypes {
     googleAccessToken: string | null; // String
     person: NexusGenRootTypes['BfPerson'] | null; // BfPerson
     role: NexusGenEnums['AccountRole'] | null; // AccountRole
+  }
+  BfMedia: { // field return type
+    id: string; // ID!
   }
   BfNode: { // field return type
     id: string; // ID!
@@ -211,6 +216,9 @@ export interface NexusGenFieldTypeNames {
     person: 'BfPerson'
     role: 'AccountRole'
   }
+  BfMediaBffsFile: { // field return type name
+    id: 'ID'
+  }
   BfOrganization: { // field return type name
     id: 'ID'
     name: 'String'
@@ -222,6 +230,7 @@ export interface NexusGenFieldTypeNames {
     name: 'String'
   }
   Mutation: { // field return type name
+    createBfMediaBffsFile: 'BfMediaBffsFile'
     createProject: 'BfContainerProject'
     linkGoogleAccount: 'BfCurrentViewer'
     loginWithGoogle: 'BfCurrentViewerAccessToken'
@@ -248,6 +257,9 @@ export interface NexusGenFieldTypeNames {
     person: 'BfPerson'
     role: 'AccountRole'
   }
+  BfMedia: { // field return type name
+    id: 'ID'
+  }
   BfNode: { // field return type name
     id: 'ID'
   }
@@ -263,6 +275,9 @@ export interface NexusGenArgTypes {
     }
   }
   Mutation: {
+    createBfMediaBffsFile: { // args
+      name: string; // String!
+    }
     createProject: { // args
       name: string; // String!
     }
@@ -286,7 +301,8 @@ export interface NexusGenArgTypes {
 export interface NexusGenAbstractTypeMembers {
   Actor: "BfOrganization" | "BfPerson"
   BfCurrentViewer: "BfCurrentViewerAccessToken" | "BfCurrentViewerAnon"
-  BfNode: "BfAccount" | "BfContainerProject" | "BfOrganization" | "BfPerson"
+  BfMedia: "BfMediaBffsFile"
+  BfNode: "BfAccount" | "BfContainerProject" | "BfMediaBffsFile" | "BfOrganization" | "BfPerson"
 }
 
 export interface NexusGenTypeInterfaces {
@@ -294,9 +310,11 @@ export interface NexusGenTypeInterfaces {
   BfContainerProject: "BfNode"
   BfCurrentViewerAccessToken: "BfCurrentViewer"
   BfCurrentViewerAnon: "BfCurrentViewer"
+  BfMediaBffsFile: "BfMedia" | "BfNode"
   BfOrganization: "Actor" | "BfNode"
   BfPerson: "Actor" | "BfNode"
   Actor: "BfNode"
+  BfMedia: "BfNode"
 }
 
 export type NexusGenObjectNames = keyof NexusGenObjects;

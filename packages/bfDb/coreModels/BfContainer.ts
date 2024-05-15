@@ -1,4 +1,4 @@
-import { BfModel } from "packages/bfDb/classes/BfModel.ts";
+import { BfNode } from "packages/bfDb/coreModels/BfNode.ts";
 
 export type BfContainerRequiredProps = {
   name: string;
@@ -15,7 +15,7 @@ export class BfContainer<
     BfContainerOptionalProps,
   BfContainerChildCreationMetadata extends BfContainerCreationMetadata =
     BfContainerCreationMetadata,
-> extends BfModel<
+> extends BfNode<
   BfContainerChildRequiredProps,
   BfContainerChildOptionalProps,
   BfContainerChildCreationMetadata

@@ -4,6 +4,7 @@ import { PageFrame } from "packages/client/components/PageFrame.tsx";
 import { Toast } from "packages/bfDs/Toast.tsx";
 import { Button } from "packages/bfDs/Button.tsx";
 import { ProjectNewCreateNewProjectMutation } from "packages/__generated__/ProjectNewCreateNewProjectMutation.graphql.ts";
+import { ProjectNewCreateBffsFileMutation } from "packages/__generated__/ProjectNewCreateBffsFileMutation.graphql.ts"
 import { useRouter } from "packages/client/contexts/RouterContext.tsx";
 
 const { useMutation } = ReactRelay;
@@ -15,6 +16,14 @@ const mutation = await graphql`
     }
   }
 `;
+
+const createBffsFileMutation = await graphql`
+  mutation ProjectNewCreateBffsFileMutation($name: String!) {
+    createBfMediaBffsFile(name: $name) {
+      id
+    }
+  }
+`
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
@@ -44,6 +53,8 @@ const styles: Record<string, React.CSSProperties> = {
 export function ProjectNew() {
   const { navigate } = useRouter();
   const [commit] = useMutation<ProjectNewCreateNewProjectMutation>(mutation);
+  const [commitCreateBffsFile] = useMutation<ProjectNewCreateBffsFileMutation>(
+    createBffsFileMutation)
   const [name, setName] = React.useState("");
   const [error, setError] = React.useState("");
   return (
@@ -55,19 +66,16 @@ export function ProjectNew() {
               <h1>Upload a video</h1>
               <p>Upload a video file up to 2000MB directly to the platform.</p>
             </div>
-            {
-              /* <FileUpload
-                onStart={() => setUploading(true)}
-                onProgress={handleProgress}
-                onComplete={handleUpload}
-                onError={(message) => setUploadError(message)}
-                project$key={project}
-                maxSizeMB={2000}
-              /> */
-            }
             <ProjectUploader
               onSelect={(file) => {
-                console.log(file);
+                commitCreateBffsFile({
+                  variables: {
+                    name: file.name,
+                  },
+                  onCompleted: (data) => {
+                    console.log(data.createBfMediaBffsFile?.id)
+                  }
+                });
               }}
               onUpload={() => {
                 commit({
@@ -95,11 +103,22 @@ export function ProjectNew() {
   );
 }
 
-function ProjectUploader({ onUpload, onSelect }) {
+type ProjectUploaderProps = {
+  onUpload: (file: File | void) => void;
+  onSelect: (file: File) => void;
+}
+
+function ProjectUploader({ onUpload, onSelect }: ProjectUploaderProps) {
+  const [file, setFile] = React.useState<File>();
+  React.useEffect(() => {
+    if (file) {
+      onSelect(file);
+    }
+  }, [file])
   return (
     <>
-      <input type="file" onChange={(e) => onSelect(e.target.files[0])} />
-      <Button onClick={onUpload} />
+      <input type="file" onChange={(e) => setFile((e?.target?.files ?? [])[0])} />
+      <Button onClick={() => {onUpload(file)}} />
     </>
   );
 }

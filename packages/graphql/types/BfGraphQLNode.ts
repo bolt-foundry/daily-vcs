@@ -1,8 +1,8 @@
 import { interfaceType } from "packages/graphql/deps.ts";
 
-export const BfNode = interfaceType({
+export const BfNodeGraphQLType = interfaceType({
   name: "BfNode",
   definition(t) {
-    t.nonNull.id("id", { description: "Unique identifier for the resource" });
+    t.nonNull.id("id", { description: "Unique identifier for the resource", resolve: (obj) => obj.bfGid });
   },
 });

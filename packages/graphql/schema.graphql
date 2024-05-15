@@ -88,6 +88,16 @@ type BfCurrentViewerAnon implements BfCurrentViewer {
   role: AccountRole
 }
 
+interface BfMedia implements BfNode {
+  """Unique identifier for the resource"""
+  id: ID!
+}
+
+type BfMediaBffsFile implements BfMedia & BfNode {
+  """Unique identifier for the resource"""
+  id: ID!
+}
+
 interface BfNode {
   """Unique identifier for the resource"""
   id: ID!
@@ -123,6 +133,7 @@ type BfPerson implements Actor & BfNode {
 }
 
 type Mutation {
+  createBfMediaBffsFile(name: String!): BfMediaBffsFile
   createProject(name: String!): BfContainerProject
   linkGoogleAccount(code: String!): BfCurrentViewer
   loginWithGoogle(credential: String!): BfCurrentViewerAccessToken

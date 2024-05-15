@@ -1,4 +1,4 @@
-import { BfModel } from "packages/bfDb/classes/BfModel.ts";
+import { BfNode } from "packages/bfDb/coreModels/BfNode.ts";
 import { CreationMetadata } from "packages/bfDb/classes/BfBaseModelMetadata.ts";
 import { BfPid, BfTid } from "packages/bfDb/classes/BfBaseModelIdTypes.ts";
 import { BfCurrentViewer } from "packages/bfDb/classes/BfCurrentViewer.ts";
@@ -16,7 +16,7 @@ type AssocCreationMetadata = CreationMetadata & {
 export class BfAssoc<
   ChildRequiredProps extends BfAssocRequiredProps = BfAssocRequiredProps,
   ChildOptionalProps = Record<string, unknown>,
-> extends BfModel<
+> extends BfNode<
   ChildRequiredProps,
   ChildOptionalProps,
   AssocCreationMetadata

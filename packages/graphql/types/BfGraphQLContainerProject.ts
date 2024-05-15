@@ -8,13 +8,14 @@ import {
   GraphQLError,
 } from "packages/graphql/deps.ts";
 import { GraphQLContext } from "packages/graphql/graphql.ts";
+import { BfContainerGraphQLType } from "packages/graphql/types/BfGraphQLContainer.ts"
 import { BfContainerProject } from "packages/bfDb/models/BfContainerProject.ts";
 
 export const BfGraphQLProjectType = objectType({
   name: "BfContainerProject",
   description: "A collection of media and stuff",
   definition(t) {
-    t.implements("BfNode");
+    t.implements(BfContainerGraphQLType);
     t.string("name");
   },
 });
