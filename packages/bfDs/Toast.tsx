@@ -1,40 +1,52 @@
 import { React } from "deps.ts";
 import { ReactDOMClient } from "packages/client/deps.ts";
 import { classnames } from "lib/classnames.ts";
+import { Button } from "packages/bfDs/Button.tsx";
 
 const { createPortal } = ReactDOMClient;
 const { useState, useEffect } = React;
 
 type ToastProps = {
+  closeCallback?: () => void;
   shouldShow: boolean;
   timeout?: number;
-  timeoutCallback?: () => void;
+  title?: string;
 };
 
 export function Toast({
   children,
+  closeCallback,
   shouldShow,
   timeout,
-  timeoutCallback,
+  title,
 }: React.PropsWithChildren<ToastProps>) {
   const [show, setShow] = useState(false);
   const [inDOM, setInDOM] = useState(false);
   const [progress, setProgress] = useState(100);
+  let domTimer: number;
+
+  function removeToast() {
+    setShow(false);
+    domTimer = setTimeout(() => {
+      setInDOM(false);
+      if (closeCallback) {
+        closeCallback();
+      }
+    }, 500);
+  }
 
   useEffect(() => {
     let visibilityTimer: number;
-    let domTimer: number;
     let progressInterval: number;
 
-    function removeToast() {
-      setShow(false);
-      domTimer = setTimeout(() => {
-        setInDOM(false);
-        timeoutCallback()
-      }, 500);
+    function clearTimers() {
+      clearTimeout(visibilityTimer);
+      clearTimeout(domTimer);
+      clearInterval(progressInterval);
     }
 
     if (shouldShow) {
+      clearTimers();
       setInDOM(true);
       setProgress(100);
       visibilityTimer = setTimeout(() => setShow(true), 10);
@@ -56,9 +68,7 @@ export function Toast({
     }
 
     return () => {
-      clearTimeout(visibilityTimer);
-      clearTimeout(domTimer);
-      clearInterval(progressInterval);
+      clearTimers();
     };
   }, [shouldShow, timeout]);
 
@@ -70,6 +80,19 @@ export function Toast({
   return inDOM
     ? createPortal(
       <div className={toastClasses}>
+        {title && (
+          <div className="toast-title">
+            {title}
+          </div>
+        )}
+        <div className="close-toast">
+          <Button
+            iconLeft="cross"
+            kind="overlayDark"
+            size="small"
+            onClick={removeToast}
+          />
+        </div>
         {children}
         {timeout && timeout > 0 && (
           <div className="toast-progress" style={{ width: `${progress}%` }}>

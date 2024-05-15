@@ -17,8 +17,7 @@ const { useLazyLoadQuery } = ReactRelay;
 const query = await graphql`
   query ProjectPageContainerProjectQuery($id: ID!) {
     containerProject(id: $id) {
-      id
-      name
+      ...ProjectView_containerProject
     }
   }
 `;
@@ -54,7 +53,7 @@ export function ProjectPage() {
   const data = useLazyLoadQuery<ProjectPageContainerProjectQuery>(query, {
     id: projectId,
   });
-  const project = data.containerProject;
+  
 
   // const subscriptionConfig: GQLSubConfigOperationType = useMemo(
   //   () => ({
@@ -86,8 +85,8 @@ export function ProjectPage() {
 
   return (
     <PageFrame xstyle={{ overflowY: "auto", flex: "auto" }}>
-      <ProjectView project$key={project} />
-      <ProjectPageToast shouldShow={project.isReadyToView} />
+      <ProjectView containerProject$key={data.containerProject} />
+      <ProjectPageToast containerProject$key={data.containerProject} />
     </PageFrame>
   );
 }
