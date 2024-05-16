@@ -5,6 +5,7 @@ import { ErrorBoundary } from "packages/client/components/ErrorBoundary.tsx";
 import type { ServerProps } from "packages/client/contexts/AppEnvironmentContext.tsx";
 import { Spinner } from "packages/bfDs/Spinner.tsx";
 import AppEnvironmentProvider from "packages/client/contexts/AppEnvironmentContext.tsx";
+import { BfDsProvider } from "packages/bfDs/conexts/BfDsContext.tsx";
 // import { ensurePosthogClientIsSetUp } from "packages/events/mod.ts";
 
 const logger = getLogger(import.meta);
@@ -23,19 +24,21 @@ const styles = {
 
 export function Client(props: ServerProps) {
   return (
-    <ErrorBoundary>
-      <Suspense
-        fallback={
-          <div style={styles.loading}>
-            <Spinner size={64} waitIcon={true} />
-          </div>
-        }
-      >
-        <AppEnvironmentProvider {...props}>
-          <App />
-        </AppEnvironmentProvider>
-      </Suspense>
-    </ErrorBoundary>
+    <BfDsProvider>
+      <ErrorBoundary>
+        <Suspense
+          fallback={
+            <div style={styles.loading}>
+              <Spinner size={64} waitIcon={true} />
+            </div>
+          }
+        >
+          <AppEnvironmentProvider {...props}>
+            <App />
+          </AppEnvironmentProvider>
+        </Suspense>
+      </ErrorBoundary>
+    </BfDsProvider>
   );
 }
 

@@ -1,6 +1,5 @@
 import { React } from "deps.ts";
 import { ReactDOMClient } from "packages/client/deps.ts";
-import { classnames } from "lib/classnames.ts";
 import { Button } from "packages/bfDs/Button.tsx";
 
 const { createPortal } = ReactDOMClient;
@@ -20,86 +19,54 @@ export function Toast({
   timeout,
   title,
 }: React.PropsWithChildren<ToastProps>) {
-  const [show, setShow] = useState(false);
-  const [inDOM, setInDOM] = useState(false);
   const [progress, setProgress] = useState(100);
-  let domTimer: number;
-
-  function removeToast() {
-    setShow(false);
-    domTimer = setTimeout(() => {
-      setInDOM(false);
-      if (closeCallback) {
-        closeCallback();
-      }
-    }, 500);
-  }
 
   useEffect(() => {
-    let visibilityTimer: number;
-    let progressInterval: number;
-
-    function clearTimers() {
-      clearTimeout(visibilityTimer);
-      clearTimeout(domTimer);
-      clearInterval(progressInterval);
-    }
-
+    let visibilityTimer: number | undefined;
+    let progressInterval: number | undefined;;
     if (shouldShow) {
-      clearTimers();
-      setInDOM(true);
-      setProgress(100);
-      visibilityTimer = setTimeout(() => setShow(true), 10);
-
       if (timeout && timeout > 0) {
         progressInterval = setInterval(() => {
           setProgress((prevProgress) => {
-            const decrement = (100 * 10) / timeout;
+            const decrement = (100 * 100) / timeout; // Decrementing every 100ms
             return Math.max(prevProgress - decrement, 0);
           });
-        }, 10);
+        }, 100);
 
-        domTimer = setTimeout(() => {
-          removeToast();
+        visibilityTimer = setTimeout(() => {
+          if (closeCallback) closeCallback();
         }, timeout);
       }
     } else {
-      removeToast();
+      setProgress(100);
+      if (visibilityTimer) clearTimeout(visibilityTimer);
+      if (progressInterval) clearInterval(progressInterval);
     }
-
     return () => {
-      clearTimers();
+      if (visibilityTimer) clearTimeout(visibilityTimer);
+      if (progressInterval) clearInterval(progressInterval);
     };
-  }, [shouldShow, timeout]);
+  }, [shouldShow, timeout, closeCallback]);
 
-  const toastClasses = classnames([
-    "toast",
-    { show },
-  ]);
-
-  return inDOM
+  return shouldShow
     ? createPortal(
-      <div className={toastClasses}>
-        {title && (
-          <div className="toast-title">
-            {title}
+        <div className="toast show">
+          {title && <div className="toast-title">{title}</div>}
+          <div className="close-toast">
+            <Button
+              iconLeft="cross"
+              kind="overlayDark"
+              size="small"
+              onClick={closeCallback}
+            />
           </div>
-        )}
-        <div className="close-toast">
-          <Button
-            iconLeft="cross"
-            kind="overlayDark"
-            size="small"
-            onClick={removeToast}
-          />
-        </div>
-        {children}
-        {timeout && timeout > 0 && (
-          <div className="toast-progress" style={{ width: `${progress}%` }}>
-          </div>
-        )}
-      </div>,
-      document.getElementById("toast-root") as Element,
-    )
+          {children}
+          {timeout && timeout > 0 && (
+            <div className="toast-progress" style={{ width: `${progress}%` }}>
+            </div>
+          )}
+        </div>,
+        document.getElementById("toast-root") as Element,
+      )
     : null;
 }
