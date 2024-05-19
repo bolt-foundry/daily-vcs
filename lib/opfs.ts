@@ -1,6 +1,6 @@
 import { getLogger, rxjs } from "deps.ts";
 import { BfError } from "lib/BfError.ts";
-const { Subject } = rxjs;
+const { ReplaySubject } = rxjs;
 const logger = getLogger(import.meta);
 
 export class ErrorOpfsGenericError extends BfError {
@@ -20,29 +20,37 @@ export type FileMetadata = {
   size: number;
 };
 
-export type OpfsProgressEvent = {
+type OpfsProgressEvent = {
   type: "progress";
   file: FileMetadata;
   bytesWritten: number;
   totalBytesWritten: number;
+  data?: Uint8Array;
 };
-export type OpfsCompletionEvent = {
+
+type OpfsCompletionEvent = {
   type: "completion";
   file: FileMetadata;
   message: string;
 };
-export type OpfsErrorEvent = {
+
+type OpfsErrorEvent = {
   type: "error";
   file: FileMetadata;
   error: ErrorOpfsGenericError;
 };
 
+export type OpfsEvent =
+  | OpfsProgressEvent
+  | OpfsCompletionEvent
+  | OpfsErrorEvent;
+
 export function streamFileToOpfs(
   file: File,
   fileName: string,
-): rxjs.Observable<OpfsProgressEvent | OpfsCompletionEvent | OpfsErrorEvent> {
-  const subject = new Subject<
-    OpfsProgressEvent | OpfsCompletionEvent | OpfsErrorEvent
+): rxjs.Observable<OpfsEvent> {
+  const subject = new ReplaySubject<
+    OpfsEvent
   >();
   const fileMetadata: FileMetadata = { name: fileName, size: file.size };
 
@@ -62,13 +70,14 @@ export function streamFileToOpfs(
         if (done) break;
         await writableStream.write(value);
         totalWritten += value.length;
-        logger.log(`Written ${totalWritten} bytes`);
+        // logger.log(`Written ${totalWritten} bytes of ${file.size}`);
 
         subject.next({
           type: "progress",
           file: fileMetadata,
           bytesWritten: value.length,
           totalBytesWritten: totalWritten,
+          data: value,
         });
       }
 

@@ -18,6 +18,7 @@ export enum DeploymentEnvs {
 }
 type Handler = (
   request: Request,
+  routeParams: Record<string, string>,
 ) => Promise<Response> | Response;
 
 const routes = new Map<string, Handler>();
@@ -38,7 +39,7 @@ routes.set("/resources/style.css", async () => {
 });
 
 routes.set("/build/Client.js", async () => {
-  const url = new URL(import.meta.resolve("build/Client.js"));
+  const url = new URL(import.meta.resolve("build/client/Client.js"));
   const style = await Deno.readTextFile(url);
   return new Response(style, {
     headers: {
@@ -153,6 +154,21 @@ routes.set("/google/oauth/end", (req) => {
 
 routes.set("/graphql", graphQlHandler);
 
+routes.set("/workers/:workerType/:workerScript", async (req, routeParams) => {
+  const workerText = await Deno.readTextFile(
+    new URL(
+      import.meta.resolve(
+        `build/workers/${routeParams.workerType}/${routeParams.workerScript}`,
+      ),
+    ),
+  );
+  return new Response(workerText, {
+    headers: {
+      "content-type": "application/javascript",
+    },
+  });
+});
+
 const defaultRoute = () => {
   return new Response("Not found", { status: 404 });
 };
@@ -164,6 +180,7 @@ Deno.serve(async (req) => {
   );
   // Attempt to match routes with optional URL params
   const pathWithParams = incomingUrl.pathname.split("?")[0];
+  let routeParams = {};
   let matchedHandler = routes.get(pathWithParams);
   if (!matchedHandler) {
     // If no direct match, try matching with optional params
@@ -172,6 +189,12 @@ Deno.serve(async (req) => {
         routePath.replace(/:\w+\??/g, "([^/]+)").replace(/\?$/, "") + "($|/)";
       const match = pathWithParams.match(new RegExp(`^${regexPath}`));
       if (match) {
+        const paramNames = (routePath.match(/:\w+\??/g) || []).map((p) =>
+          p.substring(1)
+        );
+        for (let i = 0; i < paramNames.length; i++) {
+          routeParams[paramNames[i]] = match[i + 1];
+        }
         matchedHandler = routeHandler;
         break;
       }
@@ -179,5 +202,5 @@ Deno.serve(async (req) => {
   }
   // Use the matched handler if found, otherwise use the default route
   matchedHandler = matchedHandler || defaultRoute;
-  return await matchedHandler(req);
+  return await matchedHandler(req, routeParams);
 });

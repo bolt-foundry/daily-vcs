@@ -4,12 +4,15 @@ import { PageFrame } from "packages/client/components/PageFrame.tsx";
 import { ProjectNewCreateNewProjectMutation } from "packages/__generated__/ProjectNewCreateNewProjectMutation.graphql.ts";
 import { ProjectNewCreateBffsFileMutation } from "packages/__generated__/ProjectNewCreateBffsFileMutation.graphql.ts"
 import { useRouter } from "packages/client/contexts/RouterContext.tsx";
-import { streamFileToOpfs } from "lib/opfs.ts";
+import { clearOpfsStorage, } from "lib/opfs.ts";
 import { useBfDs } from "packages/bfDs/hooks/useBfDs.tsx";
 import { Button } from "packages/bfDs/Button.tsx";
+import { streamFileIngestion } from "packages/mediaProcessing/fileIngestionWorker.ts";
 
 
 const logger = getLogger(import.meta);
+
+const { useState } = React;
 
 const { useMutation } = ReactRelay;
 
@@ -58,6 +61,7 @@ export function ProjectNew() {
   const { navigate } = useRouter();
   const [commit] = useMutation<ProjectNewCreateNewProjectMutation>(mutation);
   const [commitCreateBffsFile] = useMutation<ProjectNewCreateBffsFileMutation>(createBffsFileMutation);
+  const [info, setInfo] = useState({});
 
   const { showToast } = useBfDs();
 
@@ -68,20 +72,38 @@ export function ProjectNew() {
           <div className="content" style={styles.content}>
             <div>
               <h1>Upload a video</h1>
-              <p>Upload a video file up to 2000MB directly to the platform.</p>
             </div>
+            {JSON.stringify(info)}
             <ProjectUploader
               onSelect={(file) => {
                 commitCreateBffsFile({
                   variables: { name: file.name },
                   onCompleted: (data) => {
                     const id = data.createBfMediaBffsFile?.id;
-                    const observable = streamFileToOpfs(file, id ?? file.name);
+                    const fileName = id ?? file.name;
+                    const observable = streamFileIngestion(file, fileName);
                     observable.subscribe({
                       next: (value) => {
-                        if (value.type === "progress") {
-                          const percentage = (value.totalBytesWritten / value.file.size) * 100;
-                          showToast(`Uploading ${percentage.toFixed(2)}%`);
+                        switch(value.type) {
+                          case "audioOutput":
+                            if (value.data.type === "info") {
+                              setInfo(value.data.info);
+                            }
+                            break;
+                          case "opfsEvent":
+                            if (value.data.type === "progress") {
+                              const percentage = (value.data.totalBytesWritten / value.data.file.size) * 100;
+                              showToast(`Reading ${percentage.toFixed(2)}%`);
+                            }
+                            break;
+                          case "uploadEvent": 
+                            if (value.data.type === "uploading") {
+                              const percentage = (value.data.bytesUploaded / value.data.totalBytesToUpload) * 100;
+                              showToast(`Uploading ${percentage.toFixed(2)}%`);
+                            }
+                            break;
+                          default:
+                            break;
                         }
                       },
                       complete: () => {
@@ -91,6 +113,7 @@ export function ProjectNew() {
                         showToast(`Error: ${error.message}`, { timeout: 10000 });
                       },
                     });
+
                   },
                 });
               }}
@@ -129,7 +152,8 @@ function ProjectUploader({ onUpload, onSelect }: ProjectUploaderProps) {
   return (
     <>
       <input type="file" onChange={(e) => setFile((e?.target?.files ?? [])[0])} />
-      <Button onClick={() => { onUpload(file) }} />
+      <Button onClick={() => { onUpload(file) }} text="Create project" />
+      <Button onClick={() => { clearOpfsStorage() }} text="Clear OPFS" />
     </>
   );
 }

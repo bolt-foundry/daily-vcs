@@ -12,13 +12,11 @@ export async function build(
     sourceRoot: `${Deno.cwd()}`,
   },
 ) {
-  const path = import.meta.resolve("packages/client/Client.tsx");
-  const url = new URL(path);
   await esbuild.build({
     bundle: true,
     entryPoints: [
-      // "packages/renderer/bf-renderer-worker.ts",
-      url.pathname,
+      "packages/bfWorker/example.ts",
+      "packages/client/Client.tsx"
     ],
     write: true,
     outdir: "build",
