@@ -614,6 +614,36 @@
     "https://esm.sh/v135/@types/relay-runtime@14.1.23/lib/store/RelayModernOperationDescriptor.d.ts": {},
     "https://esm.sh/v135/@types/relay-runtime@14.1.23/lib/store/RelayOperationTracker.d.ts": {},
     "https://esm.sh/v135/@types/relay-runtime@14.1.23/lib/store/RelayResponseNormalizer.d.ts": {},
-    "https://esm.sh/v135/@types/relay-runtime@14.1.23/lib/util/JSResourceReference.d.ts": {}
+    "https://esm.sh/v135/@types/relay-runtime@14.1.23/lib/util/JSResourceReference.d.ts": {},
+    "https://esm.sh/@types/dom-webcodecs": {
+      "headers": {
+        "location": "https://esm.sh/@types/dom-webcodecs@0.1.11"
+      }
+    },
+    "https://esm.sh/@types/dom-webcodecs@0.1.11": {
+      "headers": {
+        "location": "https://esm.sh/v135/@types/dom-webcodecs@0.1.11/index.d.ts"
+      }
+    },
+    "https://esm.sh/@types/dom-webcodecs/index.d.ts": {
+      "headers": {
+        "location": "https://esm.sh/@types/dom-webcodecs@0.1.11/index.d.ts"
+      }
+    },
+    "https://esm.sh/@types/dom-webcodecs@0.1.11/index.d.ts": {
+      "headers": {
+        "location": "https://esm.sh/v135/@types/dom-webcodecs@0.1.11/index.d.ts"
+      }
+    },
+    "https://esm.sh/@types/sharedworker/index.d.ts": {
+      "headers": {
+        "location": "https://esm.sh/@types/sharedworker@0.0.115/index.d.ts"
+      }
+    },
+    "https://esm.sh/@types/sharedworker@0.0.115/index.d.ts": {
+      "headers": {
+        "location": "https://esm.sh/v135/@types/sharedworker@0.0.115/index.d.ts"
+      }
+    }
   }
 }

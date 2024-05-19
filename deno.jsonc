@@ -13,6 +13,10 @@
       "webworker.iterable",
       "deno.ns",
       "deno.unstable"
+    ],
+    "types": [
+      "https://esm.sh/v135/@types/dom-webcodecs@0.1.8/index.d.ts",
+      "https://esm.sh/v135/@types/sharedworker@0.0.115/index.d.ts"
     ]
   },
   "fmt": {
@@ -78,5 +82,5 @@
   },
   "lock": true,
   "nodeModulesDir": false,
-  "vendor": true,
+  "vendor": true
 }
