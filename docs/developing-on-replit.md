@@ -51,6 +51,11 @@ Your goal should be to commit individual units of changes one commit at a time.
 
 ### Code Reviews (WIP!)
 
+Create a changelog entry in the proper year / month combo. This should include a
+comprehensive overview of the changes, and a test plan.
+
+![example changelog](docs/assets/developing-on-replit/example-changelog.png)
+
 Code review mostly happens synchronously via pair coding, but if you're working
 async, ping
 [#code-corner on Discord](https://discord.com/channels/1128726973770903703/1128760802636218568)
@@ -63,6 +68,8 @@ whatsoever. You can leave comments and have a chat.
 ![starting a thread example](assets/developing-on-replit/starting-a-thread.png)
 
 This is still super rough, so we're figuring it out.
+
+
 
 ### Landing (WIP)
 
