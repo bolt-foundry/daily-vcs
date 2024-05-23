@@ -1,5 +1,5 @@
 import { React } from "deps.ts";
-import { ToastContext, ToastContextType } from "packages/bfDs/conexts/BfDsContext.tsx";
+import { ToastContext, ToastContextType } from "packages/bfDs/contexts/BfDsContext.tsx";
 const { useContext } = React;
 
 export const useBfDs = (): ToastContextType => {
