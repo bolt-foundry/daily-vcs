@@ -13,7 +13,7 @@ import { ProjectPage } from "packages/client/pages/ProjectPage.tsx";
 // import * as ProjectPageOldModule from "packages/client/components/ProjectPageOld.tsx";
 // import * as ReviewPageModule from "packages/client/pages/ReviewPage.tsx";
 // import * as SignupPageModule from "packages/client/pages/SignupPage.tsx";
-// import * as UITestModule from "packages/bfDs/Demo.tsx";
+import { Demo } from "packages/bfDs/Demo.tsx";
 // import * as ConfirmEmailPageModule from "packages/client/pages/ConfirmEmailPage.tsx";
 // import * as ResetPasswordPageModule from "packages/client/pages/ResetPasswordPage.tsx";
 // import * as LocalVideoPageModule from "packages/client/pages/LocalVideoPage.tsx";
@@ -33,6 +33,7 @@ export const routes = new Map([
   ["/projects/new", { Component: ProjectNew }],
   ["/projects/:projectId?", { Component: ProjectPage }],
   ["/projects", { Component: ProjectPage }],
+  ["/ui", { Component: Demo, allowLoggedOut: true }],
 ]);
 
 export function App() {

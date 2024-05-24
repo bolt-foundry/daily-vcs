@@ -6,9 +6,11 @@ import { Button } from "packages/bfDs/Button.tsx";
 const { createPortal } = ReactDOMClient;
 const { useState, useEffect } = React;
 
+const TRANSITION_DURATION = 500;
+
 type ToastProps = {
   closeCallback?: () => void;
-  shouldShow: boolean;
+  shouldShow?: boolean;
   timeout?: number;
   title?: string;
 };
@@ -16,7 +18,7 @@ type ToastProps = {
 export function Toast({
   children,
   closeCallback,
-  shouldShow,
+  shouldShow = true,
   timeout,
   title,
 }: React.PropsWithChildren<ToastProps>) {
@@ -32,7 +34,7 @@ export function Toast({
       if (closeCallback) {
         closeCallback();
       }
-    }, 500);
+    }, TRANSITION_DURATION);
   }
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function Toast({
       if (timeout && timeout > 0) {
         progressInterval = setInterval(() => {
           setProgress((prevProgress) => {
-            const decrement = (100 * 10) / timeout;
+            const decrement = (100 * 10) / (timeout + TRANSITION_DURATION);
             return Math.max(prevProgress - decrement, 0);
           });
         }, 10);

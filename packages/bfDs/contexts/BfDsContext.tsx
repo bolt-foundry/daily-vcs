@@ -1,11 +1,12 @@
 import { React } from "deps.ts";
-import { ReactDOMClient } from "packages/client/deps.ts";
 import { Toast } from "packages/bfDs/Toast.tsx";
-const { createContext, useState, useEffect } = React;
-const { createPortal } = ReactDOMClient;
+const { createContext, useState } = React;
 
 type ReactNode = React.ReactNode;
 type UseToastOptions = {
+  closeCallback?: () => void;
+  id?: string;
+  shouldShow?: boolean;
   timeout?: number;
   title?: string;
 };
@@ -19,50 +20,72 @@ export const ToastContext = createContext<ToastContextType | undefined>(
   undefined,
 );
 
+type Toast = {
+  id: string;
+  message: string | ReactNode;
+  options: UseToastOptions | undefined;
+};
+
 export const BfDsProvider = ({ children }: { children: ReactNode }) => {
-  const [toastMessage, setToastMessage] = useState<string | ReactNode>("");
-  const [options, setOptions] = useState<UseToastOptions | undefined>(
-    undefined,
-  );
-  const [shouldShow, setShouldShow] = useState(false);
+  const [toasts, setToasts] = useState<Array<Toast>>([]);
 
   function showToast(message: ReactNode, options: UseToastOptions = {}) {
-    setToastMessage(message);
-    setOptions(options);
-    setShouldShow(true);
+    const id = options.id ?? Math.random().toString(36).substring(2, 15);
+    const existingToastIndex = toasts.findIndex((toast) => toast.id === id);
+    const newToastData = {
+      id,
+      message,
+      options,
+    };
+
+    if (existingToastIndex > -1) {
+      const newToasts = [...toasts];
+      newToasts[existingToastIndex] = newToastData;
+      setToasts(newToasts);
+      return;
+    }
+
+    setToasts([...toasts, newToastData]);
   }
 
-  useEffect(() => {
-    if (!shouldShow) {
-      setToastMessage("");
-      setOptions(undefined);
-    }
-  }, [shouldShow]);
+  function hideToast(id: string) {
+    setToasts((prevToasts) =>
+      prevToasts.map((toast) =>
+        toast.id === id ? { ...toast, shouldShow: false } : toast
+      )
+    );
+    // remove from state after animate off (500ms)
+    setTimeout(() => {
+      setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
+    }, 500);
+  }
 
   const value = {
     showToast,
-    ToastComponent: shouldShow
-      ? (
-        <Toast
-          shouldShow={shouldShow}
-          title={options?.title}
-          timeout={options?.timeout}
-          closeCallback={() => setShouldShow(false)}
-        >
-          {toastMessage}
-        </Toast>
-      )
-      : null,
+    ToastComponent: (
+      <>
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            shouldShow={toast.options?.shouldShow}
+            title={toast.options?.title}
+            timeout={toast.options?.timeout}
+            closeCallback={() => {
+              hideToast(toast.id);
+              toast.options?.closeCallback?.();
+            }}
+          >
+            {toast.message}
+          </Toast>
+        ))}
+      </>
+    ),
   };
 
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {shouldShow &&
-        createPortal(
-          value.ToastComponent,
-          document.getElementById("toast-root") as Element,
-        )}
+      {value.ToastComponent}
     </ToastContext.Provider>
   );
 };

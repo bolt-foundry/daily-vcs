@@ -11,7 +11,7 @@ type Props = {
   buttons: React.ReactElement[];
 };
 
-export default function ButtonGroup(
+export function ButtonGroup(
   { buttons }: Props,
 ): React.ReactElement<typeof Button> {
   return (

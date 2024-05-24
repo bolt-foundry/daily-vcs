@@ -4,9 +4,10 @@ import { ButtonGroup } from "packages/bfDs/ButtonGroup.tsx";
 import { IconDemo } from "packages/bfDs/Icon.tsx";
 import TVStatic from "packages/client/images/TVStatic.tsx";
 import { Spinner } from "packages/bfDs/Spinner.tsx";
-import WorkflowStatusIndicator from "packages/client/components/WorkflowStatusIndicator.tsx";
+// import WorkflowStatusIndicator from "packages/client/components/WorkflowStatusIndicator.tsx";
 import { Input } from "packages/bfDs/Input.tsx";
-import { fonts } from "packages/bfDs/ui_const.tsx";
+import { fonts } from "packages/bfDs/const.tsx";
+import { useBfDs } from "packages/bfDs/hooks/useBfDs.tsx";
 
 const buttonElements = [
   {
@@ -335,10 +336,40 @@ const uiElementGroups = [
   { name: "Dark Elements", elements: darkElements, dark: true },
 ];
 
-export default function UITest() {
+export function Demo() {
+  const { showToast } = useBfDs();
   const [percent, setPercent] = React.useState<string>("65");
+  const [toastIncrement, setToastIncrement] = React.useState<number>(0);
   return (
     <div className="main" style={styles.main}>
+      <div className="element" style={styles.element}>
+        <div className="name" style={styles.name}>Toasts</div>
+        <div className="group" style={styles.group}>
+          {/* Plain toast */}
+          <Button text="Toast 1" onClick={() => showToast("Toasty")} />
+          {/* Self closing toast */}
+          <Button
+            text="Toast 2"
+            subtext="Self closing"
+            onClick={() => showToast("Toasty 2", { timeout: 4000 })}
+          />
+          {/* TODO Toast with clickable progress */}
+          <Button
+            text="Toast 3"
+            subtext="Click x20"
+            onClick={() => {
+              setToastIncrement(toastIncrement + 20);
+              showToast(`Toasty 3 - ${toastIncrement}%`, {
+                id: "george",
+                shouldShow: toastIncrement < 100,
+                closeCallback: () => {
+                  setToastIncrement(0);
+                },
+              });
+            }}
+          />
+        </div>
+      </div>
       <div className="element" style={styles.element}>
         <div style={styles.name}>Color Palette</div>
         <div style={styles.palette}>
@@ -510,7 +541,7 @@ export default function UITest() {
         <div style={styles.name}>Random</div>
         <div style={styles.group}>
           <Spinner waitIcon={true} />
-          <WorkflowStatusIndicator percent={Number(percent)} />
+          {/* <WorkflowStatusIndicator percent={Number(percent)} /> */}
           <div>
             <Button
               text="Progress button"

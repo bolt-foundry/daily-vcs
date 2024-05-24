@@ -1372,12 +1372,17 @@ input[type="range"].scrubber::-moz-range-thumb:active {
 }
 
 /* Toast */
-.toast {
-  color: var(--alwaysLight);
-  overflow: hidden;
+div#toast-root {
   position: fixed;
   bottom: 40px;
   right: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.toast {
+  color: var(--alwaysLight);
+  overflow: hidden;
   width: auto;
   height: auto;
   display: flex;
