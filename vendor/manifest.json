@@ -644,6 +644,11 @@
       "headers": {
         "location": "https://esm.sh/v135/@types/sharedworker@0.0.115/index.d.ts"
       }
+    },
+    "https://esm.sh/v128/@types/react@18.2.38/index.js": {
+      "headers": {
+        "location": "https://esm.sh/v128/@types/react@18.2.38/index.js~.d.ts"
+      }
     }
   }
 }

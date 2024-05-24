@@ -13,8 +13,14 @@ type ErrorState = {
 };
 
 export class ErrorBoundary extends React.Component<ErrorProps, ErrorState> {
+  state: ErrorState = {
+    hasError: false,
+    error: undefined,
+  }
+  props: ErrorProps;
   constructor(props: ErrorProps) {
     super(props);
+    this.props = props;
     this.state = { hasError: false };
   }
 
