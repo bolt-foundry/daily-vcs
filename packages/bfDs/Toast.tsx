@@ -6,7 +6,7 @@ import { Button } from "packages/bfDs/Button.tsx";
 const { createPortal } = ReactDOMClient;
 const { useState, useEffect } = React;
 
-const TRANSITION_DURATION = 500;
+export const TRANSITION_DURATION = 500;
 
 type ToastProps = {
   closeCallback?: () => void;

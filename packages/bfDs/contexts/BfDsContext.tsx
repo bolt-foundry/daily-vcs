@@ -1,5 +1,5 @@
 import { React } from "deps.ts";
-import { Toast } from "packages/bfDs/Toast.tsx";
+import { Toast, TRANSITION_DURATION } from "packages/bfDs/Toast.tsx";
 const { createContext, useState } = React;
 
 type ReactNode = React.ReactNode;
@@ -57,7 +57,7 @@ export const BfDsProvider = ({ children }: { children: ReactNode }) => {
     // remove from state after animate off (500ms)
     setTimeout(() => {
       setToasts((prevToasts) => prevToasts.filter((toast) => toast.id !== id));
-    }, 500);
+    }, TRANSITION_DURATION);
   }
 
   const value = {
