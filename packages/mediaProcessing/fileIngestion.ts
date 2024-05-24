@@ -21,7 +21,7 @@ export function streamFileIngestion(
   return combinedObservable;
 }
 
-interface UploadEvent {
+type UploadEvent = {
   type: "uploading";
   progress: number;
   bytesUploaded: number;
@@ -31,7 +31,6 @@ interface UploadEvent {
 function uploadFileFromStream(
   audioObservable: rxjs.Observable<AudioStreamOutput>
 ): rxjs.Observable<UploadEvent> {
-  console.log('upload')
   const replaySubject = new rxjs.Subject<UploadEvent>();
   let bytesUploaded = 0;
   let totalBytesToUpload = 0;

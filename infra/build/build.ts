@@ -4,10 +4,11 @@ import { esbuild } from "infra/build/deps.ts";
 import { generateBluey } from "lib/generateBluey.ts";
 import { denoPlugin } from "infra/build/bffEsbuild.ts";
 import esbuildDenoMdxPlugin from "infra/build/esbuildDenoMdxPlugin.ts";
+import { workerList } from "infra/build/workerList.ts";
 
 export async function build(
   buildOptions = {
-    minify: true,
+    // minify: true,
     sourcemap: "inline",
     sourceRoot: `${Deno.cwd()}`,
   },
@@ -15,7 +16,7 @@ export async function build(
   await esbuild.build({
     bundle: true,
     entryPoints: [
-      "packages/bfWorker/example.ts",
+      ...workerList,
       "packages/client/Client.tsx"
     ],
     write: true,
