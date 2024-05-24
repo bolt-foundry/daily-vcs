@@ -1,7 +1,9 @@
 #! /usr/bin/env -S deno run -A
+
 import { clientRenderer } from "packages/clientRenderer/clientRenderer.ts";
 import { getLogger } from "deps.ts";
 import { routes as appRoutes } from "packages/client/components/App.tsx";
+import { workerList } from "infra/build/workerList.ts";
 import { handler as graphQlHandler } from "packages/graphql/graphql.ts";
 import { getGoogleOauthUrl } from "lib/googleOauth.ts";
 
@@ -28,24 +30,74 @@ for (const entry of appRoutes.entries()) {
   routes.set(path, clientRenderer(allowLoggedOut));
 }
 
-routes.set("/resources/style.css", async () => {
-  const url = new URL(import.meta.resolve("resources/style.css"));
-  const style = await Deno.readTextFile(url);
-  return new Response(style, {
-    headers: {
-      "content-type": "text/css",
-    },
-  });
+for (const workerPathWithoutLeadingSlash of workerList) {
+  const workerPath = "/" + workerPathWithoutLeadingSlash;
+  routes.set(workerPath, async (_request, _routeParams) => {
+    const filePath = workerPath.replace("packages/", "build/").replace(".ts", ".js");
+    try {
+      const fileContent = await Deno.readTextFile(new URL(import.meta.resolve(filePath)));
+      return new Response(fileContent, {
+        headers: { "content-type": "application/javascript" },
+      });
+    } catch (e) { 
+      if (e instanceof Deno.errors.NotFound) {
+        return defaultRoute();
+      }
+      throw e;
+      
+    }
+
+  })
+}
+
+routes.set("/resources/:filename+", async (_req, routeParams) => {
+  const { filename } = routeParams;
+  try {
+    const fileContent = await Deno.readTextFile(
+      new URL(import.meta.resolve(`resources/${filename}`)),
+    );
+    const ext = filename.split(".").pop();
+    let contentType = "text/plain";
+
+    if (ext === "css") {
+      contentType = "text/css";
+    } else if (ext === "js") {
+      contentType = "application/javascript";
+    }
+
+    return new Response(fileContent, {
+      headers: {
+        "content-type": contentType,
+      },
+    });
+  } catch (e) {
+    return new Response("File not found", { status: 404 });
+  }
 });
 
-routes.set("/build/Client.js", async () => {
-  const url = new URL(import.meta.resolve("build/client/Client.js"));
-  const style = await Deno.readTextFile(url);
-  return new Response(style, {
-    headers: {
-      "content-type": "application/javascript",
-    },
-  });
+routes.set("/build/:filename+", async (_req, routeParams) => {
+  const { filename } = routeParams;
+  try {
+    const fileContent = await Deno.readTextFile(
+      new URL(import.meta.resolve(`build/${filename}`)),
+    );
+    const ext = filename.split(".").pop();
+    let contentType = "text/plain";
+
+    if (ext === "css") {
+      contentType = "text/css";
+    } else if (ext === "js") {
+      contentType = "application/javascript";
+    }
+
+    return new Response(fileContent, {
+      headers: {
+        "content-type": contentType,
+      },
+    });
+  } catch (e) {
+    return new Response("File not found", { status: 404 });
+  }
 });
 
 routes.set("/login", (...args) => {
@@ -60,7 +112,7 @@ routes.set("/login", (...args) => {
   return clientRenderer(false)(...args);
 });
 
-routes.set("/logout", async (...args) => {
+routes.set("/logout", () => {
   const headers = new Headers();
   headers.append("Set-Cookie", "BF_AT=; Path=/; Max-Age=0");
   headers.append("Set-Cookie", "BF_RT=; Path=/; Max-Age=0");
@@ -154,21 +206,6 @@ routes.set("/google/oauth/end", (req) => {
 
 routes.set("/graphql", graphQlHandler);
 
-routes.set("/workers/:workerType/:workerScript", async (req, routeParams) => {
-  const workerText = await Deno.readTextFile(
-    new URL(
-      import.meta.resolve(
-        `build/workers/${routeParams.workerType}/${routeParams.workerScript}`,
-      ),
-    ),
-  );
-  return new Response(workerText, {
-    headers: {
-      "content-type": "application/javascript",
-    },
-  });
-});
-
 const defaultRoute = () => {
   return new Response("Not found", { status: 404 });
 };
@@ -180,17 +217,24 @@ Deno.serve(async (req) => {
   );
   // Attempt to match routes with optional URL params
   const pathWithParams = incomingUrl.pathname.split("?")[0];
-  let routeParams = {};
+  const routeParams: Record<string, string> = {};
   let matchedHandler = routes.get(pathWithParams);
   if (!matchedHandler) {
     // If no direct match, try matching with optional params
     for (const [routePath, routeHandler] of routes) {
-      const regexPath =
-        routePath.replace(/:\w+\??/g, "([^/]+)").replace(/\?$/, "") + "($|/)";
+      const regexPath = routePath.replace(/:\w+\??\+?/g, (match) => {
+        if (match.endsWith("+")) {
+          return "(.+)";
+        } else if (match.endsWith("?")) {
+          return "([^/]*)";
+        } else {
+          return "([^/]+)";
+        }
+      }) + "($|/)";
       const match = pathWithParams.match(new RegExp(`^${regexPath}`));
       if (match) {
-        const paramNames = (routePath.match(/:\w+\??/g) || []).map((p) =>
-          p.substring(1)
+        const paramNames = (routePath.match(/:\w+\??\+?/g) || []).map((p) =>
+          p.substring(1).replace(/[\?\+]/g, "")
         );
         for (let i = 0; i < paramNames.length; i++) {
           routeParams[paramNames[i]] = match[i + 1];

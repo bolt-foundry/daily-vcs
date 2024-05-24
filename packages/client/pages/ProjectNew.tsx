@@ -1,18 +1,17 @@
-import { React, getLogger } from "deps.ts";
+import { getLogger, React } from "deps.ts";
 import { graphql, ReactRelay } from "packages/client/deps.ts";
 import { PageFrame } from "packages/client/components/PageFrame.tsx";
 import { ProjectNewCreateNewProjectMutation } from "packages/__generated__/ProjectNewCreateNewProjectMutation.graphql.ts";
-import { ProjectNewCreateBffsFileMutation } from "packages/__generated__/ProjectNewCreateBffsFileMutation.graphql.ts"
+import { ProjectNewCreateBffsFileMutation } from "packages/__generated__/ProjectNewCreateBffsFileMutation.graphql.ts";
 import { useRouter } from "packages/client/contexts/RouterContext.tsx";
-import { clearOpfsStorage, } from "lib/opfs.ts";
+import { clearOpfsStorage } from "lib/opfs.ts";
 import { useBfDs } from "packages/bfDs/hooks/useBfDs.tsx";
 import { Button } from "packages/bfDs/Button.tsx";
-import { streamFileIngestion } from "packages/mediaProcessing/fileIngestionWorker.ts";
-
+import { BfWorkerFileIngestion } from "packages/mediaProcessing/BfWorkerFileIngestion.ts";
 
 const logger = getLogger(import.meta);
 
-const { useState } = React;
+const { useState, useEffect } = React;
 
 const { useMutation } = ReactRelay;
 
@@ -60,8 +59,18 @@ const styles: Record<string, React.CSSProperties> = {
 export function ProjectNew() {
   const { navigate } = useRouter();
   const [commit] = useMutation<ProjectNewCreateNewProjectMutation>(mutation);
-  const [commitCreateBffsFile] = useMutation<ProjectNewCreateBffsFileMutation>(createBffsFileMutation);
-  const [info, setInfo] = useState({});
+  const [commitCreateBffsFile] = useMutation<ProjectNewCreateBffsFileMutation>(
+    createBffsFileMutation,
+  );
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [copyProgress, setCopyProgress] = useState(0);
+  const [audioEncodeProgress, setAudioEncodeProgress] = useState(0);
+
+  useEffect(() => {
+    showToast(
+      `Uploading ${uploadProgress.toFixed(2)}%, copying ${copyProgress.toFixed(2)}%, encoding ${audioEncodeProgress.toFixed(2)}%}`,
+    );
+  }, [uploadProgress, copyProgress, audioEncodeProgress]);
 
   const { showToast } = useBfDs();
 
@@ -73,47 +82,44 @@ export function ProjectNew() {
             <div>
               <h1>Upload a video</h1>
             </div>
-            {JSON.stringify(info)}
             <ProjectUploader
               onSelect={(file) => {
                 commitCreateBffsFile({
                   variables: { name: file.name },
                   onCompleted: (data) => {
+                    const bfWorkerFileIngestion = new BfWorkerFileIngestion();
                     const id = data.createBfMediaBffsFile?.id;
                     const fileName = id ?? file.name;
-                    const observable = streamFileIngestion(file, fileName);
+                    const observable = bfWorkerFileIngestion.ingest(
+                      file,
+                      fileName,
+                    );
                     observable.subscribe({
                       next: (value) => {
-                        switch(value.type) {
-                          case "audioOutput":
-                            if (value.data.type === "info") {
-                              setInfo(value.data.info);
-                            }
+                        switch (value.type) {
+                          case "audio": {
+                            setAudioEncodeProgress(value.progress ?? 0 * 100);
                             break;
-                          case "opfsEvent":
-                            if (value.data.type === "progress") {
-                              const percentage = (value.data.totalBytesWritten / value.data.file.size) * 100;
-                              showToast(`Reading ${percentage.toFixed(2)}%`);
-                            }
+                          }
+                          case "opfs": {
+                            setCopyProgress(value.progress ?? 0 * 100);
                             break;
-                          case "uploadEvent": 
-                            if (value.data.type === "uploading") {
-                              const percentage = (value.data.bytesUploaded / value.data.totalBytesToUpload) * 100;
-                              showToast(`Uploading ${percentage.toFixed(2)}%`);
-                            }
+                          }
+                          case "upload": {
+                            setUploadProgress(value.progress ?? 0 * 100);
                             break;
-                          default:
-                            break;
+                          }
                         }
                       },
                       complete: () => {
                         showToast("File uploaded to OPFS");
                       },
                       error: (error) => {
-                        showToast(`Error: ${error.message}`, { timeout: 10000 });
+                        showToast(`Error: ${error.message}`, {
+                          timeout: 10000,
+                        });
                       },
                     });
-
                   },
                 });
               }}
@@ -140,7 +146,7 @@ export function ProjectNew() {
 type ProjectUploaderProps = {
   onUpload: (file: File | void) => void;
   onSelect: (file: File) => void;
-}
+};
 
 function ProjectUploader({ onUpload, onSelect }: ProjectUploaderProps) {
   const [file, setFile] = React.useState<File>();
@@ -151,9 +157,22 @@ function ProjectUploader({ onUpload, onSelect }: ProjectUploaderProps) {
   }, [file]);
   return (
     <>
-      <input type="file" onChange={(e) => setFile((e?.target?.files ?? [])[0])} />
-      <Button onClick={() => { onUpload(file) }} text="Create project" />
-      <Button onClick={() => { clearOpfsStorage() }} text="Clear OPFS" />
+      <input
+        type="file"
+        onChange={(e) => setFile((e?.target?.files ?? [])[0])}
+      />
+      <Button
+        onClick={() => {
+          onUpload(file);
+        }}
+        text="Create project"
+      />
+      <Button
+        onClick={() => {
+          clearOpfsStorage();
+        }}
+        text="Clear OPFS"
+      />
     </>
   );
 }
