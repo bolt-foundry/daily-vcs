@@ -62,15 +62,21 @@ export function ProjectNew() {
   const [commitCreateBffsFile] = useMutation<ProjectNewCreateBffsFileMutation>(
     createBffsFileMutation,
   );
+  const [bffsFileName, setBffsFileName] = useState();
   const [uploadProgress, setUploadProgress] = useState(0);
   const [copyProgress, setCopyProgress] = useState(0);
   const [audioEncodeProgress, setAudioEncodeProgress] = useState(0);
 
   useEffect(() => {
-    showToast(
-      `Uploading ${uploadProgress.toFixed(2)}%, copying ${copyProgress.toFixed(2)}%, encoding ${audioEncodeProgress.toFixed(2)}%}`,
-    );
-  }, [uploadProgress, copyProgress, audioEncodeProgress]);
+    if (bffsFileName) {
+      showToast(
+        `Uploading ${(uploadProgress * 100).toFixed(2)}%, copying ${
+          (copyProgress * 100).toFixed(2)
+        }%, encoding ${(audioEncodeProgress * 100).toFixed(2)}%`,
+        { id: bffsFileName },
+      );
+    }
+  }, [uploadProgress, copyProgress, audioEncodeProgress, bffsFileName]);
 
   const { showToast } = useBfDs();
 
@@ -90,6 +96,7 @@ export function ProjectNew() {
                     const bfWorkerFileIngestion = new BfWorkerFileIngestion();
                     const id = data.createBfMediaBffsFile?.id;
                     const fileName = id ?? file.name;
+                    setBffsFileName(fileName);
                     const observable = bfWorkerFileIngestion.ingest(
                       file,
                       fileName,
