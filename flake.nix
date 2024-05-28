@@ -32,20 +32,20 @@
 
         sharedPackages = with pkgs; [
           unstablePkgs.deno
-          _1password
-          ffmpeg
         ];
 
         defaultPackages = with pkgs; [
-          yarn
         ];
 
         devShellPackages = with pkgs; [
           jq
-          jupyter
-          watchman
-          git
-          unstablePkgs.sapling
+          emscripten
+          pkg-config
+          clang_12
+          ccls
+          gdb
+          gnumake
+          emscripten
         ];
 
         deployPackages = with pkgs; [
