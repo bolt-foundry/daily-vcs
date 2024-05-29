@@ -93,7 +93,7 @@ export function ProjectNew() {
                 commitCreateBffsFile({
                   variables: { name: file.name },
                   onCompleted: (data) => {
-                    const bfWorkerFileIngestion = new BfWorkerFileIngestion();
+                    const bfWorkerFileIngestion = new BfWorkerFileIngestion(false);
                     const id = data.createBfMediaBffsFile?.id;
                     const fileName = id ?? file.name;
                     setBffsFileName(fileName);
@@ -116,6 +116,7 @@ export function ProjectNew() {
                             setUploadProgress(value.progress ?? 0 * 100);
                             break;
                           }
+                          default: logger.info(value)
                         }
                       },
                       complete: () => {

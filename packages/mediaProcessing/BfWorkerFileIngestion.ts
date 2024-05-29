@@ -1,9 +1,9 @@
 import { getLogger, rxjs } from "deps.ts";
 import { BfWorkerObservable } from "packages/bfWorker/BfWorker.ts";
 import { BfError } from "lib/BfError.ts";
-import { MP4Box } from "packages/deps.ts";
+import { createMuxedFile, extractEncodedAudio } from "packages/mediaProcessing/encodingTools.ts";
 
-const { map, Subject } = rxjs;
+const { Subject } = rxjs;
 
 const logger = getLogger(import.meta);
 
@@ -61,16 +61,6 @@ export type UploadEvent = {
   totalBytesToUpload: number;
 };
 
-export type AudioStreamOutput =
-  | {
-    type: "encodedAudioChunk";
-    data: EncodedAudioChunk;
-    progress: number;
-    totalBytesExpected: number;
-  }
-  | { type: "info"; info: string }
-  | { type: "parsing" };
-
 export class BfWorkerFileIngestion extends BfWorkerObservable {
   static {
     this.registerWorker(
@@ -80,254 +70,133 @@ export class BfWorkerFileIngestion extends BfWorkerObservable {
   }
 
   ingest = (file: File, name: string): rxjs.Observable<IngestionProgress> => {
-    const copyObservable = this.copyToOpfs(file, name);
-    const progressCopyObservable = copyObservable.pipe(
-      map((event): IngestionProgress => {
-        let progress = 0;
-        if (event.type === "progress") {
-          progress = event.totalBytesWritten / file.size;
-        } else if (event.type === "completion") {
-          progress = 1;
-        }
-        return {
-          type: "opfs",
-          progress,
-        };
-      }),
-    );
-
-    const audioObservable = this.extractAudioFromStream(copyObservable);
-    const progressAudioObservable = audioObservable.pipe(
-      map((event): IngestionProgress => {
-        let progress = 0;
-        if (event.type === "encodedAudioChunk") {
-          progress = event.progress;
-        }
-        return {
-          type: "audio",
-          progress,
-        };
-      }),
-    );
-
-    const uploadableObservable = this.uploadFileFromStream(audioObservable);
-    const progressUploadableObservable = uploadableObservable.pipe(
-      map((event): IngestionProgress => ({
-        type: "upload",
-        progress: event.progress,
-      })),
-    );
-
-    const mergedObservable = rxjs.merge(
-      progressAudioObservable,
-      progressCopyObservable,
-      progressUploadableObservable,
-    );
-
-    return mergedObservable;
-  };
-
-  private copyToOpfs(file: File, name: string): rxjs.Observable<OpfsEvent> {
-    const subject = new Subject<OpfsEvent>();
-    const fileMetadata: FileMetadata = { name, size: file.size };
-
+    // const workerEncoder = new BfWorkerEncoder();
+    // const encodeProgress = workerEncoder.encode(file, name);
+    logger.info(`Ingesting ${file.name}`);
+    const subject = new Subject<IngestionProgress>();
     (async () => {
-        let totalWritten = 0;
-      try {
-        const opfsDirectory = await navigator.storage.getDirectory();
-        const opfsFile = await opfsDirectory.getFileHandle(name, {
-          create: true,
-        });
+      let totalBytesWritten = 0;
+      const opfsDirectory = await navigator.storage.getDirectory();
+      const totalFileWritableStream = await opfsDirectory.getFileHandle(name, {
+        create: true,
+      }).then((opfsFile) => opfsFile.createWritable());
 
-        const writableStream = await opfsFile.createWritable();
-        const reader = file.stream().getReader();
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          await writableStream.write(value);
-          totalWritten += value.length;
-
-          subject.next({
-            type: "progress",
-            file: fileMetadata,
-            bytesWritten: value.length,
-            totalBytesWritten: totalWritten,
-          });
+      const reader = file.stream().getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
         }
 
-        await writableStream.close();
-        logger.log("File successfully written to Opfs");
-
+        await totalFileWritableStream.write(value);
+        totalBytesWritten += value.length;
         subject.next({
-          type: "completion",
-          file: fileMetadata,
-          message: "File successfully written to Opfs",
-        });
-        subject.complete();
-      } catch (error) {
-        logger.error(error);
-        logger.error(totalWritten)
-        subject.error({
-          type: "error",
-          file: fileMetadata,
-          error: new ErrorOpfsGenericError(error.message),
+          type: "opfs",
+          progress: totalBytesWritten / file.size,
         });
       }
-    })();
 
-    return subject.asObservable();
-  }
+      await totalFileWritableStream.close();
 
-  private extractAudioFromStream(
-    opfsObservable: rxjs.Observable<OpfsEvent>,
-  ): rxjs.Observable<AudioStreamOutput> {
-    logger.info("initializing_subject");
-    const subject = new Subject<AudioStreamOutput>();
-    const mp4boxFile = MP4Box.createFile();
-    let totalSamples = 0;
-    let extractedSamples = 0;
-    let totalBytesExpected = 0;
-    logger.info("mp4box_file_created");
-    mp4boxFile.onError = function (e) {
-      logger.info("Received Error Message " + e);
-    };
+      subject.next({type: "audio", progress: .001});
+      const fileHandle = await opfsDirectory.getFileHandle(name)
+      const fileForReading = await fileHandle.getFile()
+      const extractedAudio = await extractEncodedAudio(fileForReading);
+      subject.next({type: "audio", progress: .005});
+      
 
-    opfsObservable.subscribe({
-      next: (event) => {
-        if (event.type === "progress") {
-          const data: Uint8Array | undefined = event.data;
-          if (data) {
-            // @ts-expect-error MP4box wants this property weirdly
-            data.buffer.fileStart = totalBytesExpected;
-            mp4boxFile.appendBuffer(data.buffer);
-            totalBytesExpected += data.length;
-          }
-        }
-      },
-      complete: () => {
-        logger.info("file_completed");
-        mp4boxFile.flush();
-      },
-      error: (err) => {
-        subject.error({
-          type: "info",
-          info: `Error extracting audio: ${err.message}`,
-        });
-      },
-    });
-
-    mp4boxFile.onMoovStart = (info) => {
-      subject.next({
-        type: "parsing",
+      const { encodedAudioChunks, sampleRate, numberOfChannels, codec } =
+        extractedAudio;
+      const audioChunks: Array<AudioData> = [];
+      const audioDecoder = new AudioDecoder({
+        output: (audioData) => {
+          audioChunks.push(audioData);
+          const timecode = audioData.timestamp / audioData.sampleRate / 1000;
+        },
+        error: (e) => {
+          throw e;
+        },
       });
-    };
-
-    mp4boxFile.onReady = (info) => {
-      logger.info("mp4box_file_ready");
-      subject.next({
-        type: "info",
-        info,
+      audioDecoder.configure({
+        codec,
+        numberOfChannels,
+        sampleRate,
       });
 
-      const firstAudioTrack = info.tracks.find((track) =>
-        track.type === "audio"
+      for (const chunk of encodedAudioChunks) {
+        audioDecoder.decode(chunk);
+      }
+
+      await audioDecoder.flush();
+      // create an mp4 by itself which has a single audio track
+      const outputFile = await createMuxedFile(
+        {
+          input: {
+            audio: {
+              audioChunks,
+              sampleRate,
+              numberOfChannels,
+            },
+            // video: {
+          },
+          output: {
+            audio: {
+              bitrate: 96_000,
+              numberOfChannels,
+              sampleRate,
+            },
+          },
+          events: {
+            onAudioProgress: (progress) => {
+              // // percent here is 0 - 1
+              // const progress = (progressRatios.writing +
+              //   (percent * progressRatios.encoding)) * 100;
+              // onProgress(progress);
+              subject.next({type: "audio", progress})
+            },
+          },
+        },
       );
-      const audioTracksCount =
-        info.tracks.filter((track) => track.type === "audio").length;
-      if (audioTracksCount > 1) {
-        logger.warn("More than one audio track found, using first one");
-      }
-      if (!firstAudioTrack) {
-        throw new BfError("No audio track found");
-      }
-      totalSamples = firstAudioTrack.nb_samples;
-      logger.info(`Total samples: ${totalSamples}`);
-      mp4boxFile.setExtractionOptions(firstAudioTrack.id, firstAudioTrack, {});
-      mp4boxFile.start();
-    };
 
-    mp4boxFile.onSamples = (id, user, samples) => {
-      logger.info("i got samplez");
 
-      for (const sample of samples) {
-        const timestamp = sample.dts;
-        const data = sample.data;
-        const encodedAudioChunk = new EncodedAudioChunk({
-          data,
-          timestamp,
-          type: "key",
-        });
-        extractedSamples += 1;
-        subject.next({
-          type: "encodedAudioChunk",
-          data: encodedAudioChunk,
-          progress: extractedSamples / totalSamples,
-          totalBytesExpected,
-        });
-      }
-    };
-
-    return subject.asObservable();
-  }
-
-  private uploadFileFromStream(
-    audioObservable: rxjs.Observable<AudioStreamOutput>,
-  ): rxjs.Observable<UploadEvent> {
-    const replaySubject = new rxjs.Subject<UploadEvent>();
-    let bytesUploaded = 0;
-    let totalBytesToUpload = 0;
-
-    audioObservable.subscribe({
-      next: async (audioChunkEvent) => {
-        if (audioChunkEvent.type !== "encodedAudioChunk") {
-          return;
+      const audioFileName = `${name}_audio`;
+      const audioFileHandle = await opfsDirectory.getFileHandle(audioFileName, {
+        create: true,
+      });
+      const audioFileWritableStream = await audioFileHandle.createWritable();
+      const outputFileReader = outputFile.stream().getReader();
+      let bytesWritten = 0;
+      while (true) {
+        const { done, value } = await outputFileReader.read();
+        if (done) {
+          break;
         }
+        await audioFileWritableStream.write(value);
+        bytesWritten += value.length;
+        logger.info(`percentage: ${bytesWritten / file.size}`)
+      }
+      subject.next({type: "audio", progress: 1})
 
-        const audioChunk = audioChunkEvent.data;
-        totalBytesToUpload = audioChunkEvent.totalBytesExpected;
-        logger.debug(
-          `Uploading ${audioChunk.byteLength} bytes of ${audioChunkEvent.totalBytesExpected}`,
-        );
-        bytesUploaded += audioChunk.byteLength;
-        replaySubject.next({
-          type: "uploading",
-          progress: audioChunkEvent.progress,
-          bytesUploaded,
-          totalBytesToUpload,
-        });
+      await audioFileWritableStream.close();
+      logger.info('probably done', audioFileName);
+    })()
 
-        // try {
-        //   const response = await fetch('/upload-endpoint', {
-        //     method: 'POST',
-        //     body: audioChunk, // Assuming audioChunk is the appropriate format
-        //   });
+    // const mappedEncodeProgress = encodeProgress.pipe(
+    //   rxjs.map((progressEvent) => {
+    //     if (progressEvent.type === "encodedAudioChunk") {
+    //       return {
+    //         type: "audio",
+    //         progress: progressEvent.progress,
+    //       };
+    //     }
+    //     logger.info(progressEvent)
+    //   }),
+    //   rxjs.filter(Boolean),
+    // );
 
-        //   if (response.ok) {
-        //     bytesUploaded += audioChunk.byteLength;
-        //     const progress = bytesUploaded / totalBytesToUpload;
-
-        //     replaySubject.next({
-        //       type: "uploading",
-        //       progress,
-        //       bytesUploaded,
-        //       totalBytesToUpload
-        //     });
-        //   } else {
-        //     replaySubject.error(new Error("Failed to upload chunk"));
-        //   }
-        // } catch (error) {
-        //   replaySubject.error(error);
-        // }
-      },
-      complete: () => {
-        replaySubject.complete();
-      },
-      error: (err) => {
-        replaySubject.error(err);
-      },
-    });
-
-    return replaySubject.asObservable();
-  }
+    return rxjs.merge(
+      // mappedEncodeProgress,
+      subject.asObservable(),
+    );
+  };
 }
