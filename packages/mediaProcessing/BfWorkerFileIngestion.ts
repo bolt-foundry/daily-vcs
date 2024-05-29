@@ -70,8 +70,6 @@ export class BfWorkerFileIngestion extends BfWorkerObservable {
   }
 
   ingest = (file: File, name: string): rxjs.Observable<IngestionProgress> => {
-    // const workerEncoder = new BfWorkerEncoder();
-    // const encodeProgress = workerEncoder.encode(file, name);
     logger.info(`Ingesting ${file.name}`);
     const subject = new Subject<IngestionProgress>();
     (async () => {
