@@ -8,6 +8,7 @@
       "npm:graphql-relay@0.10.0": "npm:graphql-relay@0.10.0_graphql@16.6.0",
       "npm:graphql-yoga@5.1.1": "npm:graphql-yoga@5.1.1_graphql@16.6.0",
       "npm:graphql@16.6.0": "npm:graphql@16.6.0",
+      "npm:mp4-muxer": "npm:mp4-muxer@4.2.0",
       "npm:nexus@1.3.0": "npm:nexus@1.3.0_graphql@16.6.0",
       "npm:react-dom@18.2.0": "npm:react-dom@18.2.0_react@18.2.0",
       "npm:react-relay@16.1.0": "npm:react-relay@16.1.0_react@18.2.0",
@@ -119,6 +120,10 @@
         "integrity": "sha512-l3YHBLAol6d/IKnB9LhpD0cEZWAoe3eFKUyTYWmFmCO2Q/WOckxLQAUyMZWwZV2M/m3+4vgRoaolFqaII82/TA==",
         "dependencies": {}
       },
+      "@types/dom-webcodecs@0.1.11": {
+        "integrity": "sha512-yPEZ3z7EohrmOxbk/QTAa0yonMFkNkjnVXqbGb7D4rMr+F1dGQ8ZUFxXkyLLJuiICPejZ0AZE9Rrk9wUCczx4A==",
+        "dependencies": {}
+      },
       "@types/node@18.16.19": {
         "integrity": "sha512-IXl7o+R9iti9eBW4Wg2hx1xQDig183jj7YLn8F7udNceyfkbn1ZxmzZXuak20gR40D7pIkIY1kYGx5VIGbaHKA==",
         "dependencies": {}
@@ -130,6 +135,10 @@
           "pg-protocol": "pg-protocol@1.6.1",
           "pg-types": "pg-types@2.2.0"
         }
+      },
+      "@types/wicg-file-system-access@2020.9.8": {
+        "integrity": "sha512-ggMz8nOygG7d/stpH40WVaNvBwuyYLnrg5Mbyf6bmsj/8+gb6Ei4ZZ9/4PNpcPNTT8th9Q8sM8wYmWGjMWLX/A==",
+        "dependencies": {}
       },
       "@whatwg-node/events@0.1.1": {
         "integrity": "sha512-AyQEn5hIPV7Ze+xFoXVU3QTHXVbWPrzaOkxtENMPMuNL6VVHrp4hHfDt9nrQpjO7BgvuM95dMtkycX5M/DZR3w==",
@@ -261,6 +270,13 @@
       "lru-cache@10.2.0": {
         "integrity": "sha512-2bIM8x+VAf6JT4bKAljS1qUWgMsqZRPGJS6FSahIMPVvctcNhyVp7AJu7quxOW9jwkryBReKZY5tY5JYv2n/7Q==",
         "dependencies": {}
+      },
+      "mp4-muxer@4.2.0": {
+        "integrity": "sha512-Dr9Gm5MLL8egHdTBrx7r2sqSEUXM/cdURhn/OrtxXSC2LzP2bMLiOxZcqEGsW8WK9DinjWmPtWn7BYqS+UtNTA==",
+        "dependencies": {
+          "@types/dom-webcodecs": "@types/dom-webcodecs@0.1.11",
+          "@types/wicg-file-system-access": "@types/wicg-file-system-access@2020.9.8"
+        }
       },
       "nexus@1.3.0_graphql@16.6.0": {
         "integrity": "sha512-w/s19OiNOs0LrtP7pBmD9/FqJHvZLmCipVRt6v1PM8cRUYIbhEswyNKGHVoC4eHZGPSnD+bOf5A3+gnbt0A5/A==",
