@@ -5,9 +5,20 @@
 
 
 import type { core, connectionPluginCore } from "nexus"
-
+declare global {
+  interface NexusGenCustomInputMethods<TypeName extends string> {
+    /**
+     * The `File` scalar type represents a file upload.
+     */
+    file<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // "File";
+  }
+}
 declare global {
   interface NexusGenCustomOutputMethods<TypeName extends string> {
+    /**
+     * The `File` scalar type represents a file upload.
+     */
+    file<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "File";
     /**
      * Adds a Relay-style connection to the type, with numerous options for configuration
      *
@@ -38,6 +49,7 @@ export interface NexusGenScalars {
   Float: number
   Boolean: boolean
   ID: string
+  File: File
 }
 
 export interface NexusGenObjects {
@@ -85,6 +97,7 @@ export interface NexusGenObjects {
 
 export interface NexusGenInterfaces {
   Actor: core.Discriminate<'BfOrganization', 'required'> | core.Discriminate<'BfPerson', 'required'>;
+  BfContainer: core.Discriminate<'BfContainerProject', 'required'>;
   BfCurrentViewer: core.Discriminate<'BfCurrentViewerAccessToken', 'required'> | core.Discriminate<'BfCurrentViewerAnon', 'required'>;
   BfMedia: core.Discriminate<'BfMediaBffsFile', 'required'>;
   BfNode: core.Discriminate<'BfAccount', 'required'> | core.Discriminate<'BfContainerProject', 'required'> | core.Discriminate<'BfMediaBffsFile', 'required'> | core.Discriminate<'BfOrganization', 'required'> | core.Discriminate<'BfPerson', 'required'>;
@@ -151,6 +164,7 @@ export interface NexusGenFieldTypes {
     linkGoogleAccount: NexusGenRootTypes['BfCurrentViewer'] | null; // BfCurrentViewer
     loginWithGoogle: NexusGenRootTypes['BfCurrentViewerAccessToken'] | null; // BfCurrentViewerAccessToken
     logout: NexusGenRootTypes['BfCurrentViewer'] | null; // BfCurrentViewer
+    readTextFile: string | null; // String
     switchAccount: NexusGenRootTypes['BfCurrentViewerAccessToken'] | null; // BfCurrentViewerAccessToken
   }
   PageInfo: { // field return type
@@ -166,6 +180,9 @@ export interface NexusGenFieldTypes {
   Actor: { // field return type
     id: string; // ID!
     name: string | null; // String
+  }
+  BfContainer: { // field return type
+    id: string; // ID!
   }
   BfCurrentViewer: { // field return type
     actor: NexusGenRootTypes['Actor'] | null; // Actor
@@ -235,6 +252,7 @@ export interface NexusGenFieldTypeNames {
     linkGoogleAccount: 'BfCurrentViewer'
     loginWithGoogle: 'BfCurrentViewerAccessToken'
     logout: 'BfCurrentViewer'
+    readTextFile: 'String'
     switchAccount: 'BfCurrentViewerAccessToken'
   }
   PageInfo: { // field return type name
@@ -250,6 +268,9 @@ export interface NexusGenFieldTypeNames {
   Actor: { // field return type name
     id: 'ID'
     name: 'String'
+  }
+  BfContainer: { // field return type name
+    id: 'ID'
   }
   BfCurrentViewer: { // field return type name
     actor: 'Actor'
@@ -287,6 +308,9 @@ export interface NexusGenArgTypes {
     loginWithGoogle: { // args
       credential: string; // String!
     }
+    readTextFile: { // args
+      file: NexusGenScalars['File']; // File!
+    }
     switchAccount: { // args
       accountId: string; // ID!
     }
@@ -300,6 +324,7 @@ export interface NexusGenArgTypes {
 
 export interface NexusGenAbstractTypeMembers {
   Actor: "BfOrganization" | "BfPerson"
+  BfContainer: "BfContainerProject"
   BfCurrentViewer: "BfCurrentViewerAccessToken" | "BfCurrentViewerAnon"
   BfMedia: "BfMediaBffsFile"
   BfNode: "BfAccount" | "BfContainerProject" | "BfMediaBffsFile" | "BfOrganization" | "BfPerson"
@@ -307,13 +332,14 @@ export interface NexusGenAbstractTypeMembers {
 
 export interface NexusGenTypeInterfaces {
   BfAccount: "BfNode"
-  BfContainerProject: "BfNode"
+  BfContainerProject: "BfContainer" | "BfNode"
   BfCurrentViewerAccessToken: "BfCurrentViewer"
   BfCurrentViewerAnon: "BfCurrentViewer"
   BfMediaBffsFile: "BfMedia" | "BfNode"
   BfOrganization: "Actor" | "BfNode"
   BfPerson: "Actor" | "BfNode"
   Actor: "BfNode"
+  BfContainer: "BfNode"
   BfMedia: "BfNode"
 }
 

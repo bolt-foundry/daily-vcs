@@ -3,6 +3,7 @@ import { graphql, ReactRelay } from "packages/client/deps.ts";
 import { PageFrame } from "packages/client/components/PageFrame.tsx";
 import { ProjectNewCreateNewProjectMutation } from "packages/__generated__/ProjectNewCreateNewProjectMutation.graphql.ts";
 import { ProjectNewCreateBffsFileMutation } from "packages/__generated__/ProjectNewCreateBffsFileMutation.graphql.ts";
+import { ProjectNewUploadFileMutation } from "packages/__generated__/ProjectNewUploadFileMutation.graphql.ts";
 import { useRouter } from "packages/client/contexts/RouterContext.tsx";
 import { clearOpfsStorage } from "lib/opfs.ts";
 import { useBfDs } from "packages/bfDs/hooks/useBfDs.tsx";
@@ -30,6 +31,11 @@ const createBffsFileMutation = await graphql`
     }
   }
 `;
+
+const uploadFileMutation = await graphql`
+  mutation ProjectNewUploadFileMutation($file: File!) {
+    readTextFile(file: $file)
+  }`;
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
@@ -62,6 +68,9 @@ export function ProjectNew() {
   const [commitCreateBffsFile] = useMutation<ProjectNewCreateBffsFileMutation>(
     createBffsFileMutation,
   );
+  const [commitUploadFile] = useMutation<ProjectNewUploadFileMutation>(
+    uploadFileMutation,
+  );
   const [bffsFileName, setBffsFileName] = useState();
   const [uploadProgress, setUploadProgress] = useState(0);
   const [copyProgress, setCopyProgress] = useState(0);
@@ -88,12 +97,32 @@ export function ProjectNew() {
             <div>
               <h1>Upload a video</h1>
             </div>
+            <Button
+              onClick={() => {
+                commitUploadFile({
+                  variables: {
+                    file: null
+                  },
+                  uploadables: {
+                    file: new File(["foo"], "foo.txt", {
+                      type: "text/plain",
+                    }),
+                  },
+                  onCompleted: (result) => {
+                    logger.info(result);
+                  },
+                });
+              }}
+              text="you can do it"
+            />
             <ProjectUploader
               onSelect={(file) => {
                 commitCreateBffsFile({
                   variables: { name: file.name },
                   onCompleted: (data) => {
-                    const bfWorkerFileIngestion = new BfWorkerFileIngestion(false);
+                    const bfWorkerFileIngestion = new BfWorkerFileIngestion(
+                      false,
+                    );
                     const id = data.createBfMediaBffsFile?.id;
                     const fileName = id ?? file.name;
                     setBffsFileName(fileName);
@@ -116,7 +145,8 @@ export function ProjectNew() {
                             setUploadProgress(value.progress ?? 0 * 100);
                             break;
                           }
-                          default: logger.info(value)
+                          default:
+                            logger.info(value);
                         }
                       },
                       complete: () => {

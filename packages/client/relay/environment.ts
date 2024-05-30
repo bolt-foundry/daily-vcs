@@ -65,21 +65,41 @@ async function fetchQuery(
   operation,
   variables: unknown,
   _cacheConfig: unknown,
-  _uploadables: unknown,
+  uploadables?: RelayRuntime.UploadableMap,
 ) {
+  let body: BodyInit;
+  const headers: HeadersInit = {};
+
+  if (uploadables && Object.keys(uploadables).length > 0) {
+    const formData = new FormData();
+    formData.append("operations", JSON.stringify({
+      query: operation.text,
+      variables,
+    }));
+    const map: { [key: string]: string[] } = {};
+    Object.entries(uploadables).forEach(([key, file]) => {
+      formData.append(key, file);
+      map[key] = [`variables.${key}`];
+    });
+    formData.append("map", JSON.stringify(map));
+    body = formData;
+  } else {
+    headers["Content-Type"] = "application/json";
+    body = JSON.stringify({
+      query: operation.text,
+      variables,
+    });
+  }
+
   const response = await fetch(
     new URL("/graphql", import.meta.url),
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: operation.text,
-        variables,
-      }),
+      headers,
+      body,
     },
   );
+
   const returnResponse = await response.json();
   if (returnResponse.errors) {
     logger.error(returnResponse.errors);

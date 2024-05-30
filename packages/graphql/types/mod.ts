@@ -14,3 +14,4 @@ export * from "packages/graphql/types/BfGraphQLMediaBffsFile.ts";
 export * from "packages/graphql/types/BfGraphQLNode.ts";
 export * from "packages/graphql/types/BfGraphQLOrganization.ts";
 export * from "packages/graphql/types/BfGraphQLPerson.ts";
+export * from "packages/graphql/types/File.ts";
